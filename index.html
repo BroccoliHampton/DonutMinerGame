@@ -675,7 +675,6 @@
                 glazeColorButton: document.getElementById('glaze-color-button'),
                 zoomSlider: document.getElementById('glazery-zoom-slider'),
                 donutBalance: document.getElementById('player-donut-balance'),
-                // NOTE: Claimable payout logic remains, but is mocked since there's no contract claim
                 claimablePayoutValue: document.getElementById('player-claimable-payout-value'), 
                 percentMined: document.getElementById('player-percent-mined'),
                 glazePriceValue: document.getElementById('glaze-price-value'),
@@ -690,7 +689,7 @@
         // ===============================================================
 
         const format = (num) => Math.floor(num).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-        const formatDecimal = (num) => num.toFixed(4); // Use 4 decimals for price/payout
+        const formatDecimal = (num) => num.toFixed(4); 
         
         const formatGlazeTime = (ms) => {
             if (ms === null || ms < 0) {
@@ -732,7 +731,7 @@
                 envelope: { attack: 0.001, decay: 0.3, sustain: 0.01, release: 0.2 }
             }).connect(limiter);
             
-            const kickPattern = ['C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null];
+            const kickPattern = ['C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null];
             
             kickSequence = new Tone.Sequence((time, note) => {
                 if (note) kick.triggerAttackRelease(note, '8n', time);
@@ -1252,18 +1251,21 @@
 
 
         // ===============================================================
-        // WALLET AND CONTRACT INTERACTION (NEW CORE LOGIC)
+        // WALLET AND CONTRACT INTERACTION 
         // ===============================================================
         
         /**
          * Connects to the Farcaster wallet provider and requests the user's address.
+         * The request for eth_requestAccounts often succeeds silently in Farcaster clients.
          */
         const connectWallet = async () => {
             if (signer) return true; 
 
             try {
                 dom.glazery.actionButton.textContent = 'Connecting...';
-                
+                dom.glazery.actionButton.disabled = true; // Disable button during connection
+
+                // 1. Get Mini App SDK provider
                 const { default: sdk } = await import('https://esm.sh/@farcaster/miniapp-sdk');
                 await sdk.actions.ready();
                 
@@ -1272,11 +1274,13 @@
                     throw new Error('Wallet provider not available. Are you in a Farcaster Mini App or Base App?');
                 }
                 
+                // 2. Request Accounts (This is the call that initiates the connection)
                 const accounts = await provider.request({ method: 'eth_requestAccounts' });
                 const rawUserAddress = accounts[0];
                 
                 state.player.walletAddress = ethers.utils.getAddress(rawUserAddress);
                 
+                // 3. Ensure user is on the correct chain (Base)
                 await provider.request({
                     method: 'wallet_switchEthereumChain',
                     params: [{ chainId: CHAIN_ID }],
@@ -1298,6 +1302,8 @@
                 dom.glazery.actionButton.textContent = 'Connect Failed';
                 dom.glazery.kingStatus.textContent = 'Error!';
                 return false;
+            } finally {
+                dom.glazery.actionButton.disabled = false;
             }
         }
 
@@ -1309,6 +1315,7 @@
             if (!state.player.walletAddress) return;
             
             try {
+                // We use a simplified API route to read public and user-specific data
                 const response = await fetch(`${API_BASE_URL}/api/get-price?userAddress=${state.player.walletAddress}`);
                 const data = await response.json();
 
@@ -1325,11 +1332,11 @@
                 state.player.isBakerKing = isKing;
                 state.global.currentGlazer = currentOwner;
                 
-                // MOCK data updates (since the API only returns minimal state for now)
+                // MOCK data updates (for UI purposes)
                 state.global.totalCookiesCreated = 100000;
                 state.global.totalMiners = 1234; 
                 state.player.cookies = 1000000 + (Math.floor(Date.now() / 1000) % 1000); 
-                state.player.claimableBakeryCookies = 0; // The 90% payout is automatic, so no client-side claimable state for the payout is needed.
+                state.player.claimableBakeryCookies = 0; 
                 // ---------------------------------
                 
             } catch (error) {
@@ -1350,7 +1357,6 @@
             
             dom.glazery.actionButton.textContent = 'Fetching data...';
             
-            // Re-fetch current price/epoch/allowance from server to ensure fresh values
             const response = await fetch(`${API_BASE_URL}/api/get-price?userAddress=${state.player.walletAddress}`);
             const data = await response.json();
             if (!response.ok) {
@@ -1378,7 +1384,6 @@
                     });
                     
                     dom.glazery.actionButton.textContent = 'Waiting for approval...';
-                    // Use your check-tx.js API to wait for confirmation
                     await fetch(`${API_BASE_URL}/api/check-tx?txHash=${approveTx.hash}`);
                 }
             }
@@ -1400,7 +1405,6 @@
             );
             
             dom.glazery.actionButton.textContent = 'Waiting for Confirmation...';
-            // Use your check-tx.js API to wait for confirmation
             await fetch(`${API_BASE_URL}/api/check-tx?txHash=${takeoverTx.hash}`);
             
             playSoundEffect('purchase');
@@ -1427,7 +1431,7 @@
 
         const updateUI = () => {
             const { totalDonutSupply, totalCookiesCreated, nextHalvingAt, totalMiners, glazePrice, currentGlazer } = state.global;
-            const { isBakerKing, claimableBakeryCookies, cookies, walletAddress, glazeStartTime } = state.player;
+            const { isBakerKing, cookies, walletAddress, glazeStartTime } = state.player;
             const percentMined = totalDonutSupply > 0 ? (totalCookiesCreated / totalDonutSupply) * 100 : 0;
 
             // --- Glazery View Stats (First Row) ---
@@ -1435,7 +1439,6 @@
             dom.glazery.cps.textContent = formatDecimal(bakeryCps);
             
             if (isBakerKing) {
-                // Mock an elapsed time for the current King
                 if (!glazeStartTime) { state.player.glazeStartTime = Date.now(); }
                 const elapsedMs = Date.now() - glazeStartTime;
                 dom.glazery.baked.textContent = formatGlazeTime(elapsedMs);
@@ -1445,7 +1448,6 @@
             
             // --- Glazery View Stats (Second Row) ---
             dom.glazery.donutBalance.textContent = format(cookies);
-            // Since payout is automatic, this just reflects 0.00
             dom.glazery.claimablePayoutValue.textContent = formatDecimal(0); 
             dom.glazery.percentMined.textContent = formatDecimal(percentMined);
             
@@ -1465,17 +1467,15 @@
 
             if (state.ui.isActionPending) {
                  actionButton.disabled = true;
-                 return; // Text is set by the action handler
+                 return;
             }
             
             if (isBakerKing) {
-                // Action: Bake (Claim DONUT - mock)
-                actionButton.textContent = `Bake ${format(Math.floor(state.global.emissionRate * 1000))}`; // Mock value
+                actionButton.textContent = `Bake ${format(Math.floor(state.global.emissionRate * 1000))}`;
                 actionButton.disabled = false;
             } else {
-                // Action: Glaze (Takeover)
                 actionButton.textContent = `Glaze ($${formatDecimal(glazePrice)} USDC)`;
-                actionButton.disabled = glazePrice < 0.0001; // Require a minimal price
+                actionButton.disabled = glazePrice < 0.0001;
             }
 
 
@@ -1528,6 +1528,7 @@
         const handleMinerAction = async () => {
             if (state.ui.isActionPending) return;
             
+            // If not connected, attempt connection before proceeding
             if (!state.player.walletAddress) {
                 if (!await connectWallet()) return;
             }
@@ -1592,7 +1593,7 @@
         };
 
         // ===============================================================
-        // INITIALIZATION
+        // INITIALIZATION (MODIFIED FOR AUTO-CONNECT)
         // ===============================================================
         
         dom.nav.glazery.onclick = () => { playSoundEffect('crunch'); showView('glazery'); };
@@ -1626,8 +1627,12 @@
         }
         animate();
         
-        // Initial setup
-        setInterval(fetchContractState, 10000); 
+        // --- CRITICAL CHANGE: AUTO-CONNECT ON LAUNCH ---
+        connectWallet().then(() => {
+            fetchContractState(); 
+            setInterval(fetchContractState, 10000); 
+        });
+        // ----------------------------------------------------
     });
     
     // External Ethers.js import for immediate use in the module scope
