@@ -704,7 +704,6 @@
         }
         
         // 1. Fetch transaction data from your API
-        // Using GET with query param 'player' as implemented
         const txDataResponse = await fetch(`${API_BASE_URL}/api/transaction?player=${address}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -720,33 +719,29 @@
         const txData = await txDataResponse.json();
         console.log('[Blockchain] Transaction data received:', txData);
         
-        // --- FIX 1 & 2: CORRECT CHAIN ID AND ADD 'from' FIELD ---
         const provider = await sdk.wallet.getEthereumProvider();
         
         if (!provider) {
             throw new Error('Wallet provider not available');
         }
         
-        // Base Mainnet Chain ID is 8453, which is 0x2104 in hex.
-        // Your contract is on mainnet, so this must be correct.
-        const chainIdHex = '0x2104'; 
-        
         console.log('[Blockchain] Sending transaction...');
         
+        // IMPORTANT: The eth_sendTransaction method requires specific parameters.
+        // We will pass the data returned from the server directly, but ensure 'from' is set
+        // and that we are NOT passing the `chainId` in this inner params object.
+        const txParams = [{
+            from: address, // Ensure the 'from' address is always set
+            to: txData.params.to,
+            data: txData.params.data,
+            value: txData.params.value, 
+            // DO NOT include the 'chainId' field in the transaction parameters object.
+            // Let the Farcaster SDK/Wallet handle network selection via context.
+        }];
+
         const txHash = await provider.request({
             method: 'eth_sendTransaction',
-            params: [{
-                // 2. Added 'from' address (the user's wallet)
-                from: address, 
-                to: txData.params.to,
-                data: txData.params.data,
-                // 3. Removed redundant 'value' conversion logic.
-                // The server already returns txData.params.value as the correct '0x...' hex string.
-                value: txData.params.value, 
-                // Note: The 'chainId' is often optional here, but including it in the request 
-                // can ensure the wallet is on the right network. We use the correct mainnet hex.
-                chainId: chainIdHex 
-            }]
+            params: txParams
         });
         
         console.log('[Blockchain] Transaction sent:', txHash);
