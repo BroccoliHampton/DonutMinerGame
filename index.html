@@ -1456,18 +1456,6 @@
             }
             
             animate();
-
-            // =====================================================================
-            // CONTRACT INTEGRATION INITIALIZATION
-            // =====================================================================
-            
-            // Initialize contract integration after game is ready
-            if (typeof contractIntegration !== 'undefined' && contractIntegration.initContractIntegration) {
-                console.log('[Game] Initializing contract integration...');
-                contractIntegration.initContractIntegration();
-            } else {
-                console.warn('[Game] Contract integration module not found');
-            }
         });
 
         // =============================================================================
@@ -1760,6 +1748,20 @@
         async function initContractIntegration() {
             console.log('[Contract] Initializing contract integration...');
             
+            // Wait for dom to be defined
+            let attempts = 0;
+            while (typeof dom === 'undefined' && attempts < 50) {
+                console.log('[Contract] Waiting for DOM to be ready... attempt', attempts + 1);
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
+            if (typeof dom === 'undefined') {
+                console.error('[Contract] DOM never became ready!');
+            } else {
+                console.log('[Contract] DOM is ready!');
+            }
+            
             try {
                 // Get user address (may fail if not in Farcaster)
                 const userAddress = await getUserAddress();
@@ -1779,7 +1781,7 @@
                 
                 // CRITICAL: Replace the button handler NOW
                 console.log('[Contract] Replacing button handler...');
-                if (dom && dom.glazery && dom.glazery.actionButton) {
+                if (typeof dom !== 'undefined' && dom.glazery && dom.glazery.actionButton) {
                     dom.glazery.actionButton.onclick = handleMinerActionWithContract;
                     console.log('[Contract] Button handler replaced successfully');
                 } else {
@@ -1800,7 +1802,7 @@
                     updateUIFromContract();
                     
                     // Try to replace button even if initialization failed
-                    if (dom && dom.glazery && dom.glazery.actionButton) {
+                    if (typeof dom !== 'undefined' && dom.glazery && dom.glazery.actionButton) {
                         dom.glazery.actionButton.onclick = handleMinerActionWithContract;
                     }
                     
@@ -1860,7 +1862,13 @@
             formatTime
         };
 
-        console.log('[Contract] Contract integration module loaded. Call contractIntegration.initContractIntegration() to start.');
+        console.log('[Contract] Contract integration module loaded.');
+        
+        // Initialize after a short delay to ensure game is fully loaded
+        setTimeout(() => {
+            console.log('[Contract] Starting initialization after delay...');
+            initContractIntegration();
+        }, 1000);
     </script>
 </body>
 </html>
