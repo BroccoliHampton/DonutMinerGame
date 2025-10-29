@@ -782,7 +782,7 @@
                 dom.glazery.kingStatus.textContent = userIsMiner ? 'You' : 'Loading...';
                 dom.glazery.cps.textContent = blockchainData.claimableDonutsFormatted ? formatNumber(blockchainData.claimableDonutsFormatted) : '0.00';
                 dom.glazery.baked.textContent = formatTime(blockchainData.timeAsMiner || 0);
-                dom.glazery.glazePrice.textContent = `$${parseFloat(blockchainData.priceInEth || 0).toFixed(2)}`;
+                dom.glazery.glazePrice.textContent = `${parseFloat(blockchainData.priceInEth || 0).toFixed(6)} ETH`;
                 dom.glazery.availableBalance.textContent = `$${parseFloat(blockchainData.userEthBalanceFormatted || 0).toFixed(2)} available`;
                 dom.glazery.donutBalance.textContent = `🍩 ${formatNumber(blockchainData.userDonutBalanceFormatted || 0)}`;
                 dom.glazery.totalSupply.textContent = `🍩 ${formatNumber(blockchainData.totalDonutSupplyFormatted || 0)}`;
