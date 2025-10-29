@@ -518,6 +518,9 @@
         // =================================================================
         // BLOCKCHAIN CONFIGURATION
         // =================================================================
+        // =================================================================
+        // CONFIGURATION
+        // =================================================================
         const API_BASE_URL = 'https://last-game-kappa.vercel.app';
         const REFRESH_INTERVAL = 10000; // 10 seconds
 
@@ -540,7 +543,8 @@
             totalDonutSupplyFormatted: '0',
             timeAsMiner: 0,
             secondsUntilHalving: 0,
-            userAddress: null
+            userAddress: null,
+            fid: null
         };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -622,6 +626,13 @@
                     const { default: sdk } = await import('https://esm.sh/@farcaster/miniapp-sdk');
                     await sdk.actions.ready();
                     
+                    // Get FID from Farcaster context
+                    const context = await sdk.context;
+                    if (context && context.user) {
+                        blockchainData.fid = context.user.fid;
+                        console.log('[Blockchain] FID:', blockchainData.fid);
+                    }
+                    
                     const provider = await sdk.wallet.getEthereumProvider();
                     if (provider) {
                         const accounts = await provider.request({ method: 'eth_requestAccounts' });
@@ -682,23 +693,41 @@
                 try {
                     // Import Farcaster SDK
                     const { default: sdk } = await import('https://esm.sh/@farcaster/miniapp-sdk');
+                    await sdk.actions.ready();
                     
                     console.log('[Blockchain] Fetching transaction data...');
+                    
+                    // Get FID and address
+                    const context = await sdk.context;
+                    const fid = context?.user?.fid || blockchainData.fid || 0;
+                    const address = blockchainData.userAddress;
+                    
+                    if (!address) {
+                        alert('Please connect your wallet first');
+                        return;
+                    }
+                    
+                    console.log('[Blockchain] Using FID:', fid, 'Address:', address);
                     
                     // Get transaction data from your API
                     const txDataResponse = await fetch(`${API_BASE_URL}/api/transaction`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'Content-Type': 'application/json'
+                        },
+                        mode: 'cors',
                         body: JSON.stringify({
                             untrustedData: {
-                                fid: blockchainData.userAddress ? 1 : 0, // Will be replaced by actual FID
-                                address: blockchainData.userAddress
+                                fid: fid,
+                                address: address
                             }
                         })
                     });
                     
                     if (!txDataResponse.ok) {
-                        throw new Error('Failed to get transaction data');
+                        const errorText = await txDataResponse.text();
+                        console.error('[Blockchain] Transaction API error:', errorText);
+                        throw new Error(`Failed to get transaction data: ${txDataResponse.status}`);
                     }
                     
                     const txData = await txDataResponse.json();
@@ -707,13 +736,21 @@
                     // Send transaction using Farcaster wallet
                     const provider = await sdk.wallet.getEthereumProvider();
                     
+                    if (!provider) {
+                        throw new Error('Wallet provider not available');
+                    }
+                    
+                    // Convert chainId string to hex number for eth_sendTransaction
+                    const chainIdHex = '0x2105'; // Base mainnet = 8453 = 0x2105
+                    
+                    console.log('[Blockchain] Sending transaction...');
                     const txHash = await provider.request({
                         method: 'eth_sendTransaction',
                         params: [{
                             to: txData.params.to,
                             data: txData.params.data,
                             value: txData.params.value,
-                            chainId: txData.chainId
+                            chainId: chainIdHex
                         }]
                     });
                     
@@ -758,26 +795,26 @@
                                    blockchainData.userAddress.toLowerCase() === blockchainData.currentMiner.toLowerCase();
                 
                 // Update displays
-                dom.glazery.kingStatus.textContent = userIsMiner ? 'You' : 'None';
-                dom.glazery.cps.textContent = formatNumber(blockchainData.claimableDonutsFormatted);
-                dom.glazery.baked.textContent = formatTime(blockchainData.timeAsMiner);
-                dom.glazery.glazePrice.textContent = `$${parseFloat(blockchainData.priceInEth).toFixed(2)}`;
-                dom.glazery.availableBalance.textContent = `$${parseFloat(blockchainData.userEthBalanceFormatted).toFixed(2)} available`;
-                dom.glazery.donutBalance.textContent = `🍩 ${formatNumber(blockchainData.userDonutBalanceFormatted)}`;
-                dom.glazery.totalSupply.textContent = `🍩 ${formatNumber(blockchainData.totalDonutSupplyFormatted)}`;
-                dom.glazery.currentDps.textContent = formatNumber(blockchainData.currentDpsFormatted);
+                dom.glazery.kingStatus.textContent = userIsMiner ? 'You' : 'Loading...';
+                dom.glazery.cps.textContent = blockchainData.claimableDonutsFormatted ? formatNumber(blockchainData.claimableDonutsFormatted) : '0.00';
+                dom.glazery.baked.textContent = formatTime(blockchainData.timeAsMiner || 0);
+                dom.glazery.glazePrice.textContent = `$${parseFloat(blockchainData.priceInEth || 0).toFixed(2)}`;
+                dom.glazery.availableBalance.textContent = `$${parseFloat(blockchainData.userEthBalanceFormatted || 0).toFixed(2)} available`;
+                dom.glazery.donutBalance.textContent = `🍩 ${formatNumber(blockchainData.userDonutBalanceFormatted || 0)}`;
+                dom.glazery.totalSupply.textContent = `🍩 ${formatNumber(blockchainData.totalDonutSupplyFormatted || 0)}`;
+                dom.glazery.currentDps.textContent = formatNumber(blockchainData.currentDpsFormatted || 0);
                 
                 // Update button
                 if (userIsMiner) {
-                    dom.glazery.actionButton.textContent = `Bake ${formatNumber(blockchainData.claimableDonutsFormatted)}`;
+                    dom.glazery.actionButton.textContent = `Bake ${formatNumber(blockchainData.claimableDonutsFormatted || 0)}`;
                 } else {
                     dom.glazery.actionButton.textContent = 'Glaze';
                 }
                 
                 // Update modal
                 if (dom.modalInfo.totalSupply) {
-                    dom.modalInfo.totalSupply.textContent = `🍩 ${formatNumber(blockchainData.totalDonutSupplyFormatted)}`;
-                    dom.modalInfo.nextHalving.textContent = formatTime(blockchainData.secondsUntilHalving);
+                    dom.modalInfo.totalSupply.textContent = `🍩 ${formatNumber(blockchainData.totalDonutSupplyFormatted || 0)}`;
+                    dom.modalInfo.nextHalving.textContent = formatTime(blockchainData.secondsUntilHalving || 0);
                     
                     const minerDisplay = blockchainData.currentMiner 
                         ? `${blockchainData.currentMiner.slice(0, 6)}...${blockchainData.currentMiner.slice(-4)}`
@@ -785,6 +822,7 @@
                     dom.modalInfo.currentMiner.textContent = minerDisplay;
                 }
             }
+
 
             // =============================================================
             // AUDIO SETUP (Tone.js) - KEEPING ORIGINAL
