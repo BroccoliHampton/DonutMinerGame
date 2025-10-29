@@ -758,20 +758,17 @@
         alert(`Transaction failed: ${error.message}`);
     }
 }
-            function handleGlazeClick() {
-                console.log('[Blockchain] Glaze button clicked');
-                
-                const userIsMiner = blockchainData.userAddress && 
-                                   blockchainData.currentMiner && 
-                                   blockchainData.userAddress.toLowerCase() === blockchainData.currentMiner.toLowerCase();
-                
-                if (userIsMiner) {
-                    playSoundEffect('crunch');
-                    alert('You are the current miner! Your rewards will be claimed automatically when someone else takes over.');
-                } else {
-                    openGlazeFrame();
-                }
-            }
+          function handleGlazeClick() {
+    console.log('[Blockchain] Glaze button clicked');
+    
+    // *** REMOVED THE USER IS MINER CHECK ***
+    
+    // Play a sound effect to acknowledge the click
+    playSoundEffect('purchase'); 
+    
+    // Always open the glaze frame to initiate a transaction
+    openGlazeFrame();
+}
 
             function updateUI() {
                 console.log('[Blockchain] Updating UI');
