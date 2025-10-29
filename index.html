@@ -788,12 +788,7 @@
                 dom.glazery.totalSupply.textContent = `🍩 ${formatNumber(blockchainData.totalDonutSupplyFormatted || 0)}`;
                 dom.glazery.currentDps.textContent = formatNumber(blockchainData.currentDpsFormatted || 0);
                 
-                // Update button
-                if (userIsMiner) {
-                    dom.glazery.actionButton.textContent = `Bake ${formatNumber(blockchainData.claimableDonutsFormatted || 0)}`;
-                } else {
-                    dom.glazery.actionButton.textContent = 'Glaze';
-                }
+                dom.glazery.actionButton.textContent = 'Glaze';
                 
                 // Update modal
                 if (dom.modalInfo.totalSupply) {
