@@ -857,16 +857,13 @@
                 dom.glazery.actionButton.textContent = 'Glaze';
                 
                 // Update modal
-                if (dom.modalInfo.totalSupply) {
+           if (dom.modalInfo.totalSupply) {
                     dom.modalInfo.totalSupply.textContent = `🍩 ${formatNumber(blockchainData.totalDonutSupplyFormatted || 0)}`;
                     dom.modalInfo.nextHalving.textContent = formatTime(blockchainData.secondsUntilHalving || 0);
                     
-                    const minerDisplay = blockchainData.currentMiner 
-                        ? `${blockchainData.currentMiner.slice(0, 6)}...${blockchainData.currentMiner.slice(-4)}`
-                        : 'None';
-                    dom.modalInfo.currentMiner.textContent = minerDisplay;
+                    // FIX: Reuse the fully resolved display string from the main UI logic (Lines 60-70)
+                    dom.modalInfo.currentMiner.textContent = kingGlazerDisplay;
                 }
-            }
 
 
             // =============================================================
