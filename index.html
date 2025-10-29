@@ -822,8 +822,8 @@
                                    blockchainData.currentMiner && 
                                    blockchainData.userAddress.toLowerCase() === blockchainData.currentMiner.toLowerCase();
                 
-                // --- KING GLAZER DISPLAY LOGIC (FIXES 3 & USERNAME) ---
-                let kingGlazerDisplay;
+                // --- KING GLAZER DISPLAY FIX (FIX 3) ---
+               let kingGlazerDisplay;
 
                 if (userIsMiner) {
                     kingGlazerDisplay = 'You';
@@ -838,7 +838,7 @@
                     kingGlazerDisplay = 'None';
                 }
                 dom.glazery.kingStatus.textContent = kingGlazerDisplay;
-                // --- END KING GLAZER FIX ---
+                // --- END FIX 3 ---
 
                 dom.glazery.cps.textContent = blockchainData.claimableDonutsFormatted ? formatNumber(blockchainData.claimableDonutsFormatted) : '0.00';
                 dom.glazery.baked.textContent = formatTime(blockchainData.timeAsMiner || 0);
@@ -856,13 +856,15 @@
                 // Update button: Always set to Glaze (FIX 5)
                 dom.glazery.actionButton.textContent = 'Glaze';
                 
-                // Update modal (Consistency Fix)
+                // Update modal
                 if (dom.modalInfo.totalSupply) {
                     dom.modalInfo.totalSupply.textContent = `🍩 ${formatNumber(blockchainData.totalDonutSupplyFormatted || 0)}`;
                     dom.modalInfo.nextHalving.textContent = formatTime(blockchainData.secondsUntilHalving || 0);
                     
-                    // FIX: Reuse the fully resolved display string (King Glazer username/address)
-                    dom.modalInfo.currentMiner.textContent = kingGlazerDisplay;
+                    const minerDisplay = blockchainData.currentMiner 
+                        ? `${blockchainData.currentMiner.slice(0, 6)}...${blockchainData.currentMiner.slice(-4)}`
+                        : 'None';
+                    dom.modalInfo.currentMiner.textContent = minerDisplay;
                 }
             }
 
