@@ -6,152 +6,127 @@
     <title>Donut Miner ツ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Include Tone.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <style>
-        /* =============================================================== */
-        /* KISSAKI/TAMAGOTCHI AESTHETIC STYLING                            */
-        /* =============================================================== */
-
-        /* Custom Font - Nunito is a good match for the cute, rounded look */
+        /* [KEEPING ALL THE ORIGINAL STYLES - NO CHANGES] */
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap'); /* Changed to Comic Neue */
-        @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap'); /* NEW: Added Luckiest Guy font */
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
         
-        /* This is the "browser" background, outside the phone */
         body {
             font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            overscroll-behavior: none; /* Prevents "pull-to-refresh" */
-            
-            /* Apply app-shell styling directly to body */
-            background-color: #FFC0CB; /* Soft Pink */
+            overscroll-behavior: none;
+            background-color: #FFC0CB;
             background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg opacity='0.7'%3E%3Crect x='10' y='10' width='3' height='10' fill='%23FFD700' transform='rotate(25 11.5 15)' /%3E%3Crect x='60' y='30' width='3' height='10' fill='%23FF69B4' transform='rotate(140 61.5 35)' /%3E%3Crect x='30' y='70' width='3' height='10' fill='%2390EE90' transform='rotate(70 31.5 75)' /%3E%3Crect x='80' y='85' width='3' height='10' fill='%2387CEEB' transform='rotate(210 81.5 90)' /%3E%3Crect x='5' y='45' width='3' height='10' fill='%23FFD700' transform='rotate(100 6.5 50)' /%3E%3Crect x='90' y='5' width='3' height='10' fill='%23FF69B4' transform='rotate(300 91.5 10)' /%3E%3C/g%3E%3C/svg%3E"), 
-                            linear-gradient(135deg, #FFC0CB 0%, #FFDDE1 100%); /* Soft Pink base */
-            background-size: 200px 200px, cover; /* Adjust size for sprinkles, cover for gradient */
+                            linear-gradient(135deg, #FFC0CB 0%, #FFDDE1 100%);
+            background-size: 200px 200px, cover;
             background-blend-mode: overlay, normal;
             background-attachment: fixed;
-            color: #333333; /* Dark gray for general text */
-            
-            /* Ensure the body takes full viewport height and manages overflow */
+            color: #333333;
             min-height: 100vh;
-            display: flex; /* Use flexbox to organize main content and nav */
-            flex-direction: column; /* Stack content vertically */
-            padding: 0; /* Remove padding */
-            margin: 0; /* Remove margin */
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            margin: 0;
         }
 
-        /* Custom Colors inspired by Tamagotchi */
-        /* Changed to pale butter yellow */
         .bg-tamagotchi-bg-light { background-color: #FFFACD; } 
-        .text-tamagotchi-dark { color: #333333; } /* General dark text */
-        .text-tamagotchi-pink-dark { color: #E75480; } /* Stronger, cuter pink for accents/headings */
-        .text-tamagotchi-pink-light { color: #FF9AA2; } /* Lighter pink for accents */
+        .text-tamagotchi-dark { color: #333333; }
+        .text-tamagotchi-pink-dark { color: #E75480; }
+        .text-tamagotchi-pink-light { color: #FF9AA2; }
         
-        /* Button colors */
         .bg-tamagotchi-button-pink { 
-            background: linear-gradient(to bottom, #FFDDE1, #E75480); /* Puffy pink gradient */
+            background: linear-gradient(to bottom, #FFDDE1, #E75480);
             color: white;
             font-weight: 800;
-            border: 2px solid #C04A70; /* Darker border for depth */
+            border: 2px solid #C04A70;
         }
         .bg-tamagotchi-button-teal { 
-            background: linear-gradient(to bottom, #B3F0E6, #66CCBF); /* Teal gradient */
+            background: linear-gradient(to bottom, #B3F0E6, #66CCBF);
             color: white;
             font-weight: 800;
-            border: 2px solid #50A89C; /* Darker border for depth */
+            border: 2px solid #50A89C;
         }
         .bg-tamagotchi-button-pink:active, .bg-tamagotchi-button-teal:active {
-            transform: translateY(1px); /* Simple press effect */
+            transform: translateY(1px);
             box-shadow: none;
         }
 
-        /* Border/Card colors */
-        .border-tamagotchi-subtle { border-color: #E0E0E0; } /* Light gray border */
-        /* Changed to pale butter yellow */
+        .border-tamagotchi-subtle { border-color: #E0E0E0; }
         .bg-tamagotchi-card { 
-            background-color: #FFFACD; /* Pale Butter Yellow for cards */
-            border: 2px solid #E0E0E0; /* Subtle border */
+            background-color: #FFFACD;
+            border: 2px solid #E0E0E0;
         }
-        .border-tamagotchi-accent-pink { border-color: #FF9AA2; /* Pink accent border */
-        }
+        .border-tamagotchi-accent-pink { border-color: #FF9AA2; }
 
-        /* General rounding */
-        .rounded-tamagotchi-lg { border-radius: 20px; } /* More pronounced rounding for cards/buttons */
-        .rounded-tamagotchi-md { border-radius: 14px; } /* Medium rounding */
-        .rounded-tamagotchi-full { border-radius: 9999px; } /* Full rounding for circular elements */
+        .rounded-tamagotchi-lg { border-radius: 20px; }
+        .rounded-tamagotchi-md { border-radius: 14px; }
+        .rounded-tamagotchi-full { border-radius: 9999px; }
 
-        /* Shadows (softer, toy-like) */
-        .shadow-tamagotchi { box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1); } /* More pronounced, softer shadow */
+        .shadow-tamagotchi { box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1); }
         
         .nav-icon span {
-            font-size: 32px; /* Large emoji */
-            color: #A0A0A0; /* Soft gray for inactive icons */
+            font-size: 32px;
+            color: #A0A0A0;
             transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
         }
         .nav-icon.active span {
-            color: #E75480; /* Stronger pink for active icon */
+            color: #E75480;
             transform: scale(1.1);
         }
 
-        /* Style for the 3D canvas */
         #cookie-canvas {
             width: 100%;
             height: 100%;
-            max-width: 400px; /* Keep max width to prevent distortion on very wide screens */
-            max-height: 400px; /* Keep max height */
+            max-width: 400px;
+            max-height: 400px;
             cursor: grab;
             touch-action: none;
-            position: relative; /* Ensure canvas is positioned above static */
-            z-index: 20; /* Higher than static */
-            margin: auto; /* Center the canvas */
+            position: relative;
+            z-index: 20;
+            margin: auto;
         }
         #cookie-canvas:active {
             cursor: grabbing;
         }
 
-        /* Glaze color button styling */
-        .color-cycle-button { /* Applied to both glaze and sprinkle buttons */
-            position: absolute; /* Will be positioned relative to parent */
+        .color-cycle-button {
+            position: absolute;
             bottom: 10px;
-            width: 32px; /* Smaller width */
-            height: 32px; /* Smaller height */
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px; /* Smaller font size */
-            border-radius: 50%; /* Circular button */
+            font-size: 18px;
+            border-radius: 50%;
             cursor: pointer;
-            border: 2px solid #E0E0E0; /* Subtle border */
-            background-color: #f0f0f0; /* Default light background */
+            border: 2px solid #E0E0E0;
+            background-color: #f0f0f0;
             box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
             transition: transform 0.1s ease-in-out, background-color 0.2s;
-            z-index: 30; /* Ensure it's above other elements in the container */
+            z-index: 30;
         }
         .color-cycle-button:active {
             transform: translateY(1px);
             box-shadow: none;
         }
-        /* Specific positioning */
         #glaze-color-button {
-            right: 8px; /* Adjusted right spacing */
+            right: 8px;
         }
-        #sprinkle-color-button { /* New button */
-            right: 48px; /* 8px (glaze) + 32px (button width) + 8px (gap) */
+        #sprinkle-color-button {
+            right: 48px;
         }
-        #donut-base-color-button { /* NEW */
-            right: 88px; /* 48px (sprinkle) + 32px (button width) + 8px (gap) */
+        #donut-base-color-button {
+            right: 88px;
         }
-
-
-        /* =============================================================== */
-        /* GLITCHY STATIC TV EFFECT (Pale Butter Yellow Background)      */
-        /* =============================================================== */
 
         .glitch-static {
-            position: relative; /* Needed for pseudo-elements */
+            position: relative;
             overflow: hidden;
-            background-color: #FFFACD !important; /* Pale Butter Yellow background - Added !important to override */
+            background-color: #FFFACD !important;
         }
 
         .glitch-static::before {
@@ -162,13 +137,13 @@
             width: 100%;
             height: 100%;
             background: 
-                linear-gradient(rgba(240, 230, 200, 0.4) 1px, transparent 1px), /* Softer static lines, matching yellow */
+                linear-gradient(rgba(240, 230, 200, 0.4) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(240, 230, 200, 0.4) 1px, transparent 1px);
-            background-size: 4px 4px; /* Slightly larger static pixels */
-            animation: static-flicker 0.5s infinite alternate, static-move 3s steps(10) infinite; /* Slower animations */
-            opacity: 0.6; /* Softer static */
-            pointer-events: none; /* Allows clicks/interactions with elements behind it */
-            z-index: 15; /* Below donut, above container bg */
+            background-size: 4px 4px;
+            animation: static-flicker 0.5s infinite alternate, static-move 3s steps(10) infinite;
+            opacity: 0.6;
+            pointer-events: none;
+            z-index: 15;
         }
 
         .glitch-static::after {
@@ -181,19 +156,19 @@
             background: linear-gradient(
                 to bottom,
                 transparent 0%,
-                rgba(240, 230, 200, 0.2) 50%, /* Softer yellow scanline */
+                rgba(240, 230, 200, 0.2) 50%,
                 transparent 100%
             );
-            mix-blend-mode: overlay; /* Creates light distortion effect */
-            animation: scanline 8s linear infinite; /* Slower scanline */
-            opacity: 0.3; /* Slightly more pronounced scanline */
+            mix-blend-mode: overlay;
+            animation: scanline 8s linear infinite;
+            opacity: 0.3;
             pointer-events: none;
-            z-index: 16; /* Slightly above main static */
+            z-index: 16;
         }
 
         @keyframes static-flicker {
             0% { background-position: 0 0; opacity: 0.6; }
-            50% { background-position: 8px 8px; opacity: 0.5; } /* Larger displacement for flicker */
+            50% { background-position: 8px 8px; opacity: 0.5; }
             100% { background-position: 0 0; opacity: 0.7; }
         }
 
@@ -207,9 +182,6 @@
             100% { background-position: 0 100%; }
         }
 
-        /* =============================================================== */
-        /* FALLING SNOW (GREY PIXELS) EFFECT                              */
-        /* =============================================================== */
         .falling-snow {
             position: absolute;
             top: 0;
@@ -217,8 +189,8 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 17; /* Above static, below donut */
-            overflow: hidden; /* Ensures snowflakes don't go outside */
+            z-index: 17;
+            overflow: hidden;
         }
 
         .falling-snow::before,
@@ -230,7 +202,6 @@
             width: 100%;
             height: 100%;
             background-image: 
-                /* Create many small grey "pixels" */
                 radial-gradient(circle at 10% 20%, #A0A0A0 1px, transparent 1px),
                 radial-gradient(circle at 70% 80%, #C0C0C0 1px, transparent 1px),
                 radial-gradient(circle at 30% 60%, #B0B0B0 1px, transparent 1px),
@@ -243,16 +214,16 @@
                 radial-gradient(circle at 5% 50%, #E0E0E0 1px, transparent 1px),
                 radial-gradient(circle at 95% 45%, #D0D0D0 1px, transparent 1px);
             background-repeat: repeat;
-            background-size: 20px 20px; /* Control the density */
-            animation: snowfall 10s linear infinite; /* Slower fall */
-            opacity: 0.7; /* Make them subtle */
+            background-size: 20px 20px;
+            animation: snowfall 10s linear infinite;
+            opacity: 0.7;
         }
 
         .falling-snow::after {
-            animation-delay: 5s; /* Stagger the animation for more continuous effect */
-            background-size: 25px 25px; /* Different size for variety */
+            animation-delay: 5s;
+            background-size: 25px 25px;
             opacity: 0.6;
-            filter: blur(0.5px); /* Slight blur for depth */
+            filter: blur(0.5px);
         }
 
         @keyframes snowfall {
@@ -260,91 +231,77 @@
             100% { transform: translateY(100%); }
         }
 
-        /* =============================================================== */
-        /* SCROLLING TICKER                                                */
-        /* =============================================================== */
         .ticker-wrap {
             width: 100%;
             overflow: hidden;
-            background-color: #333; /* Dark background */
-            padding: 4px 0; /* Vertical padding */
+            background-color: #333;
+            padding: 4px 0;
             border-top: 2px solid #555;
             border-bottom: 2px solid #555;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
         }
         
-        /* Specific margins for top and bottom tickers */
         #top-ticker { margin-bottom: 8px; }
         #bottom-ticker { margin-top: 8px; }
-
 
         .ticker-move {
             display: inline-block;
             white-space: nowrap;
-            animation: scroll-ticker 20s linear infinite; /* Adjust duration for speed */
-            color: #FFFACD; /* Pale Butter Yellow text */
+            animation: scroll-ticker 20s linear infinite;
+            color: #FFFACD;
             font-size: 14px;
             font-weight: bold;
-            font-family: 'Comic Neue', cursive; /* Match other text */
+            font-family: 'Comic Neue', cursive;
             text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
         }
 
         .ticker-move-reverse {
             display: inline-block;
             white-space: nowrap;
-            animation: scroll-ticker-reverse 20s linear infinite; /* Adjust duration for speed */
-            color: #FFFACD; /* Pale Butter Yellow text */
+            animation: scroll-ticker-reverse 20s linear infinite;
+            color: #FFFACD;
             font-size: 14px;
             font-weight: bold;
-            font-family: 'Comic Neue', cursive; /* Match other text */
+            font-family: 'Comic Neue', cursive;
             text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
         }
 
         @keyframes scroll-ticker {
-            0% { transform: translateX(0%); } /* Start visible */
-            100% { transform: translateX(-50%); } /* Move halfway, showing the duplicated text */
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
         }
 
         @keyframes scroll-ticker-reverse {
-            0% { transform: translateX(-50%); } /* Start halfway */
-            100% { transform: translateX(0%); } /* Move back to start */
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0%); }
         }
         
-        /* =============================================================== */
-        /* DARK MODE STYLING                                               */
-        /* =============================================================== */
-
-        /* Chocolate brown background */
-        body.dark { /* Changed from #app-shell.dark to body.dark */
-            background-color: #5C3317; /* Chocolate Brown */
+        body.dark {
+            background-color: #5C3317;
             background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%236B4A34' fill-opacity='0.4'%3E%3Cpath d='M10 0L0 10l10 10 10-10z'/%3E%3Cpath d='M0 10L10 20l10-10L10 0z'/%3E%3C/g%3E%3C/svg%3E"), 
                             linear-gradient(135deg, #5C3317 0%, #3D2B1F 100%);
         }
 
-        /* Dark cards */
-        body.dark .bg-tamagotchi-card { /* Changed from #app-shell.dark to body.dark */
-            background-color: #3D2B1F; /* Dark, rich brown */
-            border-color: #4A3A2A; /* Darker border */
+        body.dark .bg-tamagotchi-card {
+            background-color: #3D2B1F;
+            border-color: #4A3A2A;
         }
         
-        /* Light text for dark backgrounds */
-        body.dark .text-tamagotchi-dark { color: #F5E6C1; } /* Creamy white text */
-        body.dark .text-gray-500 { color: #A8998A; } /* Lighter, desaturated brown text */
+        body.dark .text-tamagotchi-dark { color: #F5E6C1; }
+        body.dark .text-gray-500 { color: #A8998A; }
         body.dark .text-gray-600 { color: #B8A99A; }
         
-        /* Pinks can stay, they pop nicely on brown */
-        body.dark .text-tamagotchi-pink-dark { color: #FF9AA2; } /* Lighten the pink a bit */
+        body.dark .text-tamagotchi-pink-dark { color: #FF9AA2; }
 
-        /* Glitch background */
-        body.dark .glitch-static { /* Changed from #app-shell.dark to body.dark */
-            background-color: #3D2B1F !important; /* Dark brown */
+        body.dark .glitch-static {
+            background-color: #3D2B1F !important;
         }
-        body.dark .glitch-static::before { /* Changed from #app-shell.dark to body.dark */
+        body.dark .glitch-static::before {
             background: 
                 linear-gradient(rgba(150, 130, 110, 0.4) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(150, 130, 110, 0.4) 1px, transparent 1px);
         }
-        body.dark .glitch-static::after { /* Changed from #app-shell.dark to body.dark */
+        body.dark .glitch-static::after {
             background: linear-gradient(
                 to bottom,
                 transparent 0%,
@@ -353,69 +310,61 @@
             );
         }
         
-        /* Falling snow (grey pixels) will look good on dark */
-        body.dark .falling-snow::before { /* Changed from #app-shell.dark to body.dark */
+        body.dark .falling-snow::before {
             opacity: 0.4;
         }
-        body.dark .falling-snow::after { /* Changed from #app-shell.dark to body.dark */
+        body.dark .falling-snow::after {
             opacity: 0.3;
         }
 
-        /* Subtle borders */
-        body.dark .border-tamagotchi-subtle { border-color: #4A3A2A; } /* Changed from #app-shell.dark to body.dark */
+        body.dark .border-tamagotchi-subtle { border-color: #4A3A2A; }
         
-        /* Light-on-dark for nav */
-        body.dark .nav-icon span { /* Changed from #app-shell.dark to body.dark */
-            color: #A8998A; /* Lighter inactive icon */
+        body.dark .nav-icon span {
+            color: #A8998A;
         }
-        body.dark .nav-icon.active span { /* Changed from #app-shell.dark to body.dark */
-            color: #FF9AA2; /* Lighter active pink */
+        body.dark .nav-icon.active span {
+            color: #FF9AA2;
         }
         
-        /* Color cycle button */
-        body.dark .color-cycle-button { /* Changed from #app-shell.dark to body.dark */
+        body.dark .color-cycle-button {
             background-color: #3D2B1F;
             border-color: #4A3A2A;
-            color: #F5E6C1; /* Light text */
+            color: #F5E6C1;
         }
         
-        /* App background for sticky footer */
-        body.dark .bg-tamagotchi-bg-light { /* Changed from #app-shell.dark to body.dark */
-            background-color: #3D2B1F; /* Dark brown */
+        body.dark .bg-tamagotchi-bg-light {
+            background-color: #3D2B1F;
         }
 
-        /* NEW: Zoom Slider Styling */
         .zoom-slider {
             position: absolute;
             top: 50%;
-            right: 8px; /* Adjusted to match new button spacing */
-            transform: translateY(-50%); /* Center vertically */
-            width: 16px; /* Track thickness */
-            height: 100px; /* Track length */
+            right: 8px;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 100px;
             -webkit-appearance: none;
             appearance: none;
-            writing-mode: vertical-lr; /* Make it vertical */
+            writing-mode: vertical-lr;
             direction: ltr;
             background: rgba(0, 0, 0, 0.1);
-            border-radius: 8px; /* Slightly smaller border radius */
+            border-radius: 8px;
             z-index: 30;
             padding: 0;
             transition: background 0.2s;
         }
-        /* Dark mode style for slider */
-        body.dark .zoom-slider { /* Changed from #app-shell.dark to body.dark */
+        body.dark .zoom-slider {
             background: rgba(255, 255, 255, 0.2);
         }
 
-        /* Thumb styling */
         .zoom-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 22px; /* Touch target */
+            width: 22px;
             height: 22px;
-            background: #FFFACD; /* Pale Butter Yellow */
+            background: #FFFACD;
             border-radius: 50%;
-            border: 2px solid #E75480; /* Pink border */
+            border: 2px solid #E75480;
             cursor: grab;
         }
         .zoom-slider::-moz-range-thumb {
@@ -426,47 +375,46 @@
             border: 2px solid #E75480;
             cursor: grab;
         }
-        /* Dark mode thumb */
-        body.dark .zoom-slider::-webkit-slider-thumb { /* Changed from #app-shell.dark to body.dark */
-            background: #3D2B1F; /* Dark brown */
-            border-color: #FF9AA2; /* Lighter pink */
-        }
-        body.dark .zoom-slider::-moz-range-thumb { /* Changed from #app-shell.dark to body.dark */
+        body.dark .zoom-slider::-webkit-slider-thumb {
             background: #3D2B1F;
             border-color: #FF9AA2;
         }
-        /* END NEW STYLES */
-
+        body.dark .zoom-slider::-moz-range-thumb {
+            background: #3D2B1F;
+            border-color: #FF9AA2;
+        }
     </style>
 </head>
 <body class="text-tamagotchi-dark">
         
-    <main class="flex-grow flex flex-col px-3 pt-4 pb-1 overflow-y-auto max-w-lg mx-auto w-full"> <!-- Added max-w-lg mx-auto w-full for content centering --><div class="flex justify-between items-center mb-2">
+    <main class="flex-grow flex flex-col px-3 pt-4 pb-1 overflow-y-auto max-w-lg mx-auto w-full">
+        <div class="flex justify-between items-center mb-2">
             <div class="flex flex-col">
                 <h1 class="text-3xl font-black text-tamagotchi-pink-dark" style="font-family: 'Luckiest Guy', cursive;">Donut Miner</h1>
                 
-                <!-- NEW: Profile Name Section (MOVED & SHRUNK) --><div class="bg-tamagotchi-card rounded-tamagotchi-lg shadow-tamagotchi p-2 flex items-center space-x-3 mt-1">
+                <div class="bg-tamagotchi-card rounded-tamagotchi-lg shadow-tamagotchi p-2 flex items-center space-x-3 mt-1">
                     <div>
-                        <div id="player-profile-name" class="font-extrabold text-sm truncate text-tamagotchi-dark">DonutEnthusiast_123</div>
+                        <div id="player-profile-name" class="font-extrabold text-sm truncate text-tamagotchi-dark">Loading...</div>
                     </div>
                 </div>
-                <!-- END: Profile Name Section --></div>
-            <div class="grid grid-cols-2 gap-1 self-start"> <!-- MODIFIED: Changed to grid --><!-- Row 1 --><button id="dark-mode-toggle-button" class="bg-tamagotchi-button-teal text-white text-base w-8 h-8 flex items-center justify-center rounded-tamagotchi-md shadow-tamagotchi active:opacity-80"> <!-- MODIFIED: Size/Text -->🌙
+            </div>
+            <div class="grid grid-cols-2 gap-1 self-start">
+                <button id="dark-mode-toggle-button" class="bg-tamagotchi-button-teal text-white text-base w-8 h-8 flex items-center justify-center rounded-tamagotchi-md shadow-tamagotchi active:opacity-80">🌙
                 </button>
-                <button id="info-button" class="bg-tamagotchi-button-pink text-white text-base w-8 h-8 flex items-center justify-center rounded-tamagotchi-md shadow-tamagotchi active:opacity-80"> <!-- MODIFIED: Size/Text & MOVED -->❓
+                <button id="info-button" class="bg-tamagotchi-button-pink text-white text-base w-8 h-8 flex items-center justify-center rounded-tamagotchi-md shadow-tamagotchi active:opacity-80">❓
                 </button>
-                <!-- Row 2 --><button id="music-toggle-button" class="bg-tamagotchi-button-pink text-white text-base w-8 h-8 flex items-center justify-center rounded-tamagotchi-md shadow-tamagotchi active:opacity-80"> <!-- MODIFIED: Size/Text -->🔇
+                <button id="music-toggle-button" class="bg-tamagotchi-button-pink text-white text-base w-8 h-8 flex items-center justify-center rounded-tamagotchi-md shadow-tamagotchi active:opacity-80">🔇
                 </button>
-                <button id="sfx-toggle-button" class="bg-tamagotchi-button-teal text-white text-base w-8 h-8 flex items-center justify-center rounded-tamagotchi-md shadow-tamagotchi active:opacity-80"> <!-- MODIFIED: Size/Text -->🔊
+                <button id="sfx-toggle-button" class="bg-tamagotchi-button-teal text-white text-base w-8 h-8 flex items-center justify-center rounded-tamagotchi-md shadow-tamagotchi active:opacity-80">🔊
                 </button>
             </div>
         </div>
 
-        <!-- =============================================================== --><!-- GLAZERY VIEW (Restored)                                       --><!-- =============================================================== --><div id="view-glazery" class="flex-grow flex flex-col">
-            <!-- REMOVED: Glazery h2 Subtitle --><!-- REMOVED: Profile Name Section --><div class="bg-tamagotchi-card rounded-tamagotchi-lg shadow-tamagotchi p-2 grid grid-cols-3 gap-2">
+        <div id="view-glazery" class="flex-grow flex flex-col">
+            <div class="bg-tamagotchi-card rounded-tamagotchi-lg shadow-tamagotchi p-2 grid grid-cols-3 gap-2">
                 <div class="text-center">
                     <div class="text-xs text-gray-500 font-semibold">King Glazer</div>
-                    <div id="bakery-king-status" class="font-extrabold text-sm truncate text-tamagotchi-dark">None</div>
+                    <div id="bakery-king-status" class="font-extrabold text-sm truncate text-tamagotchi-dark">Loading...</div>
                 </div>
                 <div class="text-center">
                     <div class="text-xs text-gray-500 font-semibold">Glazed</div>
@@ -478,8 +426,9 @@
                 </div>
             </div>
 
-            <!-- MOVED: Second Row of Stats DIV was here --><div id="top-ticker" class="ticker-wrap" style="margin-bottom: 4px; margin-top: 8px;"> <!-- MODIFIED: Added margin-top --><div class="ticker-move">
-                    <!-- UPDATED TEXT --><span>Glaze price doubles each time a new Glazer takes over, and price cools down to $0 over 1 hour. ... Glaze price doubles each time a new Glazer takes over, and price cools down to $0 over 1 hour. ... </span>
+            <div id="top-ticker" class="ticker-wrap" style="margin-bottom: 4px; margin-top: 8px;">
+                <div class="ticker-move">
+                    <span>Glaze price doubles each time a new Glazer takes over, and price cools down to $0 over 1 hour. ... Glaze price doubles each time a new Glazer takes over, and price cools down to $0 over 1 hour. ... </span>
                 </div>
             </div>
 
@@ -487,12 +436,14 @@
                 <div class="falling-snow"></div>
                 <canvas id="cookie-canvas"></canvas>
                 <button id="glaze-color-button" class="color-cycle-button shadow-tamagotchi bg-white text-tamagotchi-dark">🎨</button>
-                <button id="sprinkle-color-button" class="color-cycle-button shadow-tamagotchi bg-white text-tamagotchi-dark">🌈</button> <!-- NEW: Sprinkle color button --><button id="donut-base-color-button" class="color-cycle-button shadow-tamagotchi bg-white text-tamagotchi-dark">🍩</button> <!-- NEW: Donut base color button --><!-- NEW: Zoom Slider --><input id="glazery-zoom-slider" type="range" class="zoom-slider">
+                <button id="sprinkle-color-button" class="color-cycle-button shadow-tamagotchi bg-white text-tamagotchi-dark">🌈</button>
+                <button id="donut-base-color-button" class="color-cycle-button shadow-tamagotchi bg-white text-tamagotchi-dark">🍩</button>
+                <input id="glazery-zoom-slider" type="range" class="zoom-slider">
             </div>
 
             <div id="bottom-ticker" class="ticker-wrap" style="margin-top: 4px;">
                 <div class="ticker-move-reverse">
-                    <!-- UPDATED TEXT --><span>Glaze price doubles each time a new Glazer takes over, and price cools down to $0 over 1 hour. ... Glaze price doubles each time a new Glazer takes over, and price cools down to $0 over 1 hour. ... </span>
+                    <span>Glaze price doubles each time a new Glazer takes over, and price cools down to $0 over 1 hour. ... Glaze price doubles each time a new Glazer takes over, and price cools down to $0 over 1 hour. ... </span>
                 </div>
             </div>
             
@@ -500,8 +451,8 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <div class="text-xs font-semibold text-gray-600">Glaze Price</div>
-                        <div class="text-xl font-extrabold text-tamagotchi-dark">$23.23</div>
-                        <div class="text-xs text-gray-500">$400.00 available</div>
+                        <div id="glaze-price-display" class="text-xl font-extrabold text-tamagotchi-dark">$0.00</div>
+                        <div id="available-balance-display" class="text-xs text-gray-500">$0.00 available</div>
                     </div>
                     <button id="bakery-action-button" class="bg-tamagotchi-button-pink text-white py-2 px-6 rounded-tamagotchi-md text-sm font-bold active:opacity-80 disabled:opacity-50 shadow-tamagotchi">
                         Glaze
@@ -509,33 +460,32 @@
                 </div>
             </div>
 
-            <!-- NEW: Second Row of Stats --><div class="bg-tamagotchi-card rounded-tamagotchi-lg shadow-tamagotchi p-2 grid grid-cols-3 gap-2 mt-2">
+            <div class="bg-tamagotchi-card rounded-tamagotchi-lg shadow-tamagotchi p-2 grid grid-cols-3 gap-2 mt-2">
                 <div class="text-center">
                     <div class="text-xs text-gray-500 font-semibold">Donut Balance</div>
-                    <div id="player-donut-balance" class="font-extrabold text-sm truncate text-tamagotchi-dark">0</div>
+                    <div id="player-donut-balance" class="font-extrabold text-sm truncate text-tamagotchi-dark">🍩 0</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-xs text-gray-500 font-semibold">Total Glaze Time</div>
-                    <div id="player-total-glaze-time" class="font-extrabold text-sm text-tamagotchi-dark">00:00:00</div>
+                    <div class="text-xs text-gray-500 font-semibold">Total Supply</div>
+                    <div id="total-supply-display" class="font-extrabold text-sm text-tamagotchi-dark">🍩 0</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-xs text-gray-500 font-semibold">% Mined</div>
-                    <div class="font-extrabold text-sm text-tamagotchi-dark"><span id="player-percent-mined">0.00</span>%</div>
+                    <div class="text-xs text-gray-500 font-semibold">DPS</div>
+                    <div id="current-dps-display" class="font-extrabold text-sm text-tamagotchi-dark">0</div>
                 </div>
             </div>
 
         </div>
+    </main>
 
-        <!-- =============================================================== --><!-- ABOUT VIEW (Restored)                                         --><!-- =============================================================== --><!-- REMOVED view-about DIV --><!-- BAKERY VIEW REMOVED --></main>
-
-    <!-- REMOVED nav ELEMENT --><!-- NEW INFO MODAL --><div id="info-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+    <div id="info-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
     <div id="info-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-tamagotchi-card rounded-tamagotchi-lg shadow-tamagotchi p-4 z-50 hidden w-11/12 max-w-xs text-tamagotchi-dark overflow-y-auto" style="max-height: 90vh;">
         <div class="flex justify-between items-center mb-2">
             <h3 class="text-xl font-bold text-tamagotchi-pink-dark">Info</h3>
             <button id="info-modal-close" class="text-2xl font-bold text-gray-500 hover:text-tamagotchi-pink-dark">&times;</button>
         </div>
-        <!-- CONTENT MOVED FROM 'ABOUT' TAB --><div class="space-y-3">
-            <!-- UPDATED INFO TEXT --><div class="bg-tamagotchi-card rounded-tamagotchi-lg shadow-tamagotchi p-4 space-y-4 text-tamagotchi-dark">
+        <div class="space-y-3">
+            <div class="bg-tamagotchi-card rounded-tamagotchi-lg shadow-tamagotchi p-4 space-y-4 text-tamagotchi-dark">
                 <p class="font-bold text-lg" style="font-family: 'Comic Neue', cursive;">
                     Hello and welcome to Donut Miner!
                 </p>
@@ -546,73 +496,70 @@
                     Glaze price doubles each time a new Glazer takes over, and price cools down to $0 over 1 hour.
                 </p>
             </div>
-            <!-- END UPDATED INFO TEXT --><!-- NEW: Global Donut Stats --><h3 class="text-xl font-bold text-tamagotchi-pink-dark pt-2">Global Donut Stats</h3>
+            <h3 class="text-xl font-bold text-tamagotchi-pink-dark pt-2">Global Donut Stats</h3>
             <div class="bg-tamagotchi-card rounded-tamagotchi-lg shadow-tamagotchi p-4 space-y-3 text-tamagotchi-dark">
-                
                 <div class="flex justify-between items-center">
                     <span class="text-sm font-semibold text-gray-600">Total Donut Supply</span>
                     <span id="modal-total-supply" class="font-extrabold text-tamagotchi-dark">🍩 0</span>
                 </div>
-                
-                <div class="flex justify-between items-center">
-                    <span class="text-sm font-semibold text-gray-600">Total % Mined</span>
-                    <span id="modal-percent-mined" class="font-extrabold text-tamagotchi-dark">0.00%</span>
-                </div>
-
                 <div class="flex justify-between items-center">
                     <span class="text-sm font-semibold text-gray-600">Time Until Halving</span>
                     <span id="modal-next-halving" class="font-extrabold text-tamagotchi-dark">--:--:--</span>
                 </div>
-
                 <div class="flex justify-between items-center">
-                    <span class="text-sm font-semibold text-gray-600">Total Miners</span>
-                    <span id="modal-total-miners" class="font-extrabold text-tamagotchi-dark">👤 0</span>
+                    <span class="text-sm font-semibold text-gray-600">Current Miner</span>
+                    <span id="modal-current-miner" class="font-extrabold text-tamagotchi-dark text-xs">None</span>
                 </div>
-
             </div>
-            <!-- END NEW SECTION --></div>
-        <!-- END MOVED CONTENT --></div>
+        </div>
+    </div>
 
 <script>
+        // =================================================================
+        // BLOCKCHAIN CONFIGURATION
+        // =================================================================
+        const API_BASE_URL = 'https://last-game-kappa.vercel.app';
+        const REFRESH_INTERVAL = 10000; // 10 seconds
+
+        // =================================================================
+        // BLOCKCHAIN STATE  
+        // =================================================================
+        let blockchainData = {
+            currentMiner: null,
+            price: '0',
+            priceInEth: '0.0',
+            currentDps: '0',
+            currentDpsFormatted: '0',
+            userDonutBalance: '0',
+            userDonutBalanceFormatted: '0',
+            userEthBalance: '0',
+            userEthBalanceFormatted: '0',
+            claimableDonuts: '0',
+            claimableDonutsFormatted: '0',
+            totalDonutSupply: '0',
+            totalDonutSupplyFormatted: '0',
+            timeAsMiner: 0,
+            secondsUntilHalving: 0,
+            userAddress: null
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
 
-            // ===============================================================
-            // GAME STATE
-            // ===============================================================
+            // =============================================================
+            // UI STATE (Non-blockchain)
+            // =============================================================
             
             const state = {
-                // Player State
-                player: {
-                    cookies: 1000000,
-                    isBakerKing: false,
-                    claimableBakeryCookies: 0,
-                    totalBakedCookies: 0,
-                    glazeStartTime: null,
-                    totalGlazeTimeMs: 0, // NEW: Track total time
-                },
-                // Global Game State
-                global: {
-                    emissionRate: 10,
-                    totalCookiesCreated: 0,
-                    nextHalvingAt: 1000000,
-                    totalDonutSupply: 1000000000,
-                    totalMiners: 1234,
-                },
-                // UI State
                 ui: {
-                    // REMOVED activeView
                     isDarkMode: false,
                     isSfxMuted: false
                 }
             };
 
-            // ===============================================================
+            // =============================================================
             // DOM ELEMENTS
-            // ===============================================================
+            // =============================================================
             const dom = {
-                // REMOVED views property
-                // REMOVED aboutPage property
-                // REMOVED nav property
                 glazery: {
                     kingStatus: document.getElementById('bakery-king-status'),
                     cps: document.getElementById('bakery-cps'),
@@ -621,60 +568,186 @@
                     canvas: document.getElementById('cookie-canvas'),
                     rainContainer: document.getElementById('cookie-rain-container'),
                     glazeColorButton: document.getElementById('glaze-color-button'),
-                    sprinkleColorButton: document.getElementById('sprinkle-color-button'), // NEW
-                    donutBaseColorButton: document.getElementById('donut-base-color-button'), // NEW
+                    sprinkleColorButton: document.getElementById('sprinkle-color-button'),
+                    donutBaseColorButton: document.getElementById('donut-base-color-button'),
                     zoomSlider: document.getElementById('glazery-zoom-slider'),
-                    // NEW: Second row stats
                     donutBalance: document.getElementById('player-donut-balance'),
-                    totalGlazeTime: document.getElementById('player-total-glaze-time'),
-                    percentMined: document.getElementById('player-percent-mined'),
+                    glazePrice: document.getElementById('glaze-price-display'),
+                    availableBalance: document.getElementById('available-balance-display'),
+                    totalSupply: document.getElementById('total-supply-display'),
+                    currentDps: document.getElementById('current-dps-display'),
                 },
+                profileName: document.getElementById('player-profile-name'),
                 musicToggleButton: document.getElementById('music-toggle-button'),
                 sfxToggleButton: document.getElementById('sfx-toggle-button'),
                 darkModeToggleButton: document.getElementById('dark-mode-toggle-button'),
-                // NEW
                 infoButton: document.getElementById('info-button'),
                 infoModal: document.getElementById('info-modal'),
                 infoModalOverlay: document.getElementById('info-modal-overlay'),
                 infoModalClose: document.getElementById('info-modal-close'),
-                // NEW: Modal info elements
                 modalInfo: {
                     totalSupply: document.getElementById('modal-total-supply'),
-                    percentMined: document.getElementById('modal-percent-mined'),
                     nextHalving: document.getElementById('modal-next-halving'),
-                    totalMiners: document.getElementById('modal-total-miners'),
+                    currentMiner: document.getElementById('modal-current-miner'),
                 }
             };
 
-            // ===============================================================
+            // =============================================================
             // HELPER FUNCTIONS
-            // ===============================================================
+            // =============================================================
 
-            const format = (num) => Math.floor(num).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-            const formatDecimal = (num) => num.toFixed(2);
+            const formatNumber = (num) => {
+                const n = parseFloat(num);
+                if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
+                if (n >= 1000) return (n / 1000).toFixed(2) + 'K';
+                return n.toFixed(2);
+            };
             
-            const formatGlazeTime = (ms) => {
-                if (ms === null || ms < 0) {
-                    return '00:00:00';
-                }
-                const totalSeconds = Math.floor(ms / 1000);
-                const hours = Math.floor(totalSeconds / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                const seconds = totalSeconds % 60;
-                
-                return [hours, minutes, seconds]
-                    .map(v => v.toString().padStart(2, '0'))
-                    .join(':');
+            const formatTime = (seconds) => {
+                const h = Math.floor(seconds / 3600);
+                const m = Math.floor((seconds % 3600) / 60);
+                const s = seconds % 60;
+                return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
             };
 
-            // ===============================================================
-            // AUDIO SETUP (Tone.js)
-            // ===============================================================
+            // =============================================================
+            // BLOCKCHAIN FUNCTIONS
+            // =============================================================
+            
+            async function getUserAddress() {
+                try {
+                    console.log('[Blockchain] Getting user address...');
+                    
+                    // Try Farcaster SDK
+                    const { default: sdk } = await import('https://esm.sh/@farcaster/miniapp-sdk');
+                    await sdk.actions.ready();
+                    
+                    const provider = await sdk.wallet.getEthereumProvider();
+                    if (provider) {
+                        const accounts = await provider.request({ method: 'eth_requestAccounts' });
+                        const address = accounts[0];
+                        console.log('[Blockchain] User address:', address);
+                        blockchainData.userAddress = address;
+                        
+                        // Display shortened address
+                        if (dom.profileName) {
+                            dom.profileName.textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
+                        }
+                        
+                        return address;
+                    }
+                } catch (error) {
+                    console.log('[Blockchain] Could not get address:', error.message);
+                }
+                
+                if (dom.profileName) {
+                    dom.profileName.textContent = 'Not Connected';
+                }
+                return null;
+            }
+
+            async function fetchGameState(userAddress = null) {
+                try {
+                    const url = userAddress 
+                        ? `${API_BASE_URL}/api/get-game-state?userAddress=${userAddress}`
+                        : `${API_BASE_URL}/api/get-game-state`;
+                    
+                    console.log('[Blockchain] Fetching:', url);
+                    
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' },
+                        mode: 'cors'
+                    });
+                    
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    
+                    const data = await response.json();
+                    console.log('[Blockchain] Data received:', data);
+                    
+                    blockchainData = { ...blockchainData, ...data };
+                    updateUI();
+                    return data;
+                } catch (error) {
+                    console.error('[Blockchain] Fetch error:', error);
+                    return null;
+                }
+            }
+
+            function openGlazeFrame() {
+                console.log('[Blockchain] Opening glaze frame');
+                donutSpinSpeed = 0.5; // Spin the donut!
+                playSoundEffect('purchase');
+                
+                const frameUrl = `${API_BASE_URL}/api/payment-frame`;
+                window.open(frameUrl, '_blank');
+                
+                // Refresh state after transaction
+                setTimeout(() => {
+                    console.log('[Blockchain] Refreshing after transaction...');
+                    fetchGameState(blockchainData.userAddress);
+                }, 3000);
+            }
+
+            function handleGlazeClick() {
+                console.log('[Blockchain] Glaze button clicked');
+                
+                const userIsMiner = blockchainData.userAddress && 
+                                   blockchainData.currentMiner && 
+                                   blockchainData.userAddress.toLowerCase() === blockchainData.currentMiner.toLowerCase();
+                
+                if (userIsMiner) {
+                    playSoundEffect('crunch');
+                    alert('You are the current miner! Your rewards will be claimed automatically when someone else takes over.');
+                } else {
+                    openGlazeFrame();
+                }
+            }
+
+            function updateUI() {
+                console.log('[Blockchain] Updating UI');
+                
+                // Check if user is miner
+                const userIsMiner = blockchainData.userAddress && 
+                                   blockchainData.currentMiner && 
+                                   blockchainData.userAddress.toLowerCase() === blockchainData.currentMiner.toLowerCase();
+                
+                // Update displays
+                dom.glazery.kingStatus.textContent = userIsMiner ? 'You' : 'None';
+                dom.glazery.cps.textContent = formatNumber(blockchainData.claimableDonutsFormatted);
+                dom.glazery.baked.textContent = formatTime(blockchainData.timeAsMiner);
+                dom.glazery.glazePrice.textContent = `$${parseFloat(blockchainData.priceInEth).toFixed(2)}`;
+                dom.glazery.availableBalance.textContent = `$${parseFloat(blockchainData.userEthBalanceFormatted).toFixed(2)} available`;
+                dom.glazery.donutBalance.textContent = `🍩 ${formatNumber(blockchainData.userDonutBalanceFormatted)}`;
+                dom.glazery.totalSupply.textContent = `🍩 ${formatNumber(blockchainData.totalDonutSupplyFormatted)}`;
+                dom.glazery.currentDps.textContent = formatNumber(blockchainData.currentDpsFormatted);
+                
+                // Update button
+                if (userIsMiner) {
+                    dom.glazery.actionButton.textContent = `Bake ${formatNumber(blockchainData.claimableDonutsFormatted)}`;
+                } else {
+                    dom.glazery.actionButton.textContent = 'Glaze';
+                }
+                
+                // Update modal
+                if (dom.modalInfo.totalSupply) {
+                    dom.modalInfo.totalSupply.textContent = `🍩 ${formatNumber(blockchainData.totalDonutSupplyFormatted)}`;
+                    dom.modalInfo.nextHalving.textContent = formatTime(blockchainData.secondsUntilHalving);
+                    
+                    const minerDisplay = blockchainData.currentMiner 
+                        ? `${blockchainData.currentMiner.slice(0, 6)}...${blockchainData.currentMiner.slice(-4)}`
+                        : 'None';
+                    dom.modalInfo.currentMiner.textContent = minerDisplay;
+                }
+            }
+
+            // =============================================================
+            // AUDIO SETUP (Tone.js) - KEEPING ORIGINAL
+            // =============================================================
             let kick, hiHat, bass, melody;
             let kickSequence, hiHatSequence, bassSequence, melodySequence;
             let isMusicPlaying = false;
             let isAudioInitialized = false;
-
             let purchaseSound, cuteClickSound;
 
             function initAudio() {
@@ -685,7 +758,6 @@
                 Tone.Transport.swingSubdivision = '8n';
                 const limiter = new Tone.Limiter(-6).toDestination();
 
-                // 1. KICK DRUM
                 kick = new Tone.MembraneSynth({
                     pitchDecay: 0.01,
                     octaves: 6,
@@ -700,7 +772,6 @@
                 }, kickPattern, '8n');
                 kickSequence.loop = true;
 
-                // 2. HI-HAT
                 hiHat = new Tone.NoiseSynth({
                     noise: { type: 'white' },
                     envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.05 }
@@ -713,7 +784,6 @@
                 }, hiHatPattern, '8n');
                 hiHatSequence.loop = true;
 
-                // 3. BASS LINE
                 bass = new Tone.MonoSynth({
                     oscillator: { type: 'sawtooth' },
                     filter: { Q: 2, type: 'lowpass', cutoff: 400 },
@@ -727,7 +797,6 @@
                 }, bassPattern, '8n');
                 bassSequence.loop = true;
 
-                // 4. MELODY
                 melody = new Tone.FMSynth({
                     harmonicity: 3,
                     modulationIndex: 10,
@@ -742,7 +811,6 @@
                 }, melodyPattern, '8n');
                 melodySequence.loop = true;
 
-                // Initialize SFX
                 cuteClickSound = new Tone.FMSynth({
                     oscillator: { type: 'sine' },
                     envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.1 },
@@ -758,7 +826,7 @@
                 isAudioInitialized = true;
             }
 
-            function playSoundEffect(sound, ...args) {
+            function playSoundEffect(sound) {
                 if (state.ui.isSfxMuted) return;
 
                 if (Tone.context.state !== 'running') {
@@ -769,22 +837,19 @@
                     initAudio();
                 }
                 
-                if (!state.ui.isSfxMuted) {
-                    if (sound === 'crunch') {
-                        cuteClickSound.triggerAttackRelease('C6', '32n', Tone.now());
-                    }
-                    if (sound === 'purchase') {
-                        purchaseSound.triggerAttackRelease('C5', '16n', Tone.now());
-                        purchaseSound.triggerAttackRelease('E5', '16n', Tone.now() + 0.05);
-                        purchaseSound.triggerAttackRelease('G5', '16n', Tone.now() + 0.1);
-                    }
+                if (sound === 'crunch') {
+                    cuteClickSound.triggerAttackRelease('C6', '32n', Tone.now());
+                }
+                if (sound === 'purchase') {
+                    purchaseSound.triggerAttackRelease('C5', '16n', Tone.now());
+                    purchaseSound.triggerAttackRelease('E5', '16n', Tone.now() + 0.05);
+                    purchaseSound.triggerAttackRelease('G5', '16n', Tone.now() + 0.1);
                 }
             }
             
             function toggleSfx() {
                 state.ui.isSfxMuted = !state.ui.isSfxMuted;
                 dom.sfxToggleButton.textContent = state.ui.isSfxMuted ? '🔇' : '🔊';
-
                 if (!state.ui.isSfxMuted) {
                     playSoundEffect('crunch');
                 }
@@ -800,49 +865,25 @@
                 }
 
                 if (isMusicPlaying) {
-                    // NEW: Only stop the Transport. This stops all events
-                    // and resets the Transport time to 0.
                     Tone.Transport.stop();
-                    
-                    /* REMOVED: Explicitly stopping sequences caused errors 
-                       and issues restarting.
-                    if (kickSequence) kickSequence.stop();
-                    if (hiHatSequence) hiHatSequence.stop();
-                    if (bassSequence) bassSequence.stop();
-                    if (melodySequence) melodySequence.stop();
-                    */
-                    
                     dom.musicToggleButton.textContent = '🔇';
                 } else {
                     Tone.Transport.start();
-                    
-                    // NEW: Check if sequences are 'stopped' before starting them.
-                    // This ensures they start on the first play, and also
-                    // restart correctly after being stopped by the Transport.
-                    if (kickSequence && kickSequence.state === 'stopped') {
-                         kickSequence.start(0);
-                    }
-                    if (hiHatSequence && hiHatSequence.state === 'stopped') {
-                         hiHatSequence.start(0);
-                    }
-                    if (bassSequence && bassSequence.state === 'stopped') {
-                         bassSequence.start(0);
-                    }
-                    if (melodySequence && melodySequence.state === 'stopped') {
-                         melodySequence.start(0);
-                    }
-
+                    if (kickSequence && kickSequence.state === 'stopped') kickSequence.start(0);
+                    if (hiHatSequence && hiHatSequence.state === 'stopped') hiHatSequence.start(0);
+                    if (bassSequence && bassSequence.state === 'stopped') bassSequence.start(0);
+                    if (melodySequence && melodySequence.state === 'stopped') melodySequence.start(0);
                     dom.musicToggleButton.textContent = '🎵';
                 }
                 isMusicPlaying = !isMusicPlaying;
             }
 
-            // ===============================================================
-            // DARK MODE TOGGLE (NEW)
-            // ===============================================================
+            // =============================================================
+            // DARK MODE TOGGLE
+            // =============================================================
             function toggleDarkMode() {
                 state.ui.isDarkMode = !state.ui.isDarkMode;
-                const body = document.body; // Changed from appShell to body
+                const body = document.body;
                 if (state.ui.isDarkMode) {
                     body.classList.add('dark');
                     dom.darkModeToggleButton.textContent = '☀️';
@@ -852,9 +893,9 @@
                 }
             }
 
-            // ===============================================================
-            // INFO MODAL (NEW)
-            // ===============================================================
+            // =============================================================
+            // INFO MODAL
+            // =============================================================
             function showInfoModal() {
                 playSoundEffect('crunch');
                 dom.infoModal.classList.remove('hidden');
@@ -862,57 +903,44 @@
             }
 
             function hideInfoModal() {
-                // No sound on close, feels better
-                // playSoundEffect('crunch'); 
                 dom.infoModal.classList.add('hidden');
                 dom.infoModalOverlay.classList.add('hidden');
             }
 
-            // ===============================================================
-            // 3D GLAZERY SETUP
-            // ===============================================================
+            // =============================================================
+            // 3D GLAZERY SETUP - KEEPING ALL ORIGINAL CODE
+            // =============================================================
 
-            let scene, camera, renderer, donutGroup, glazeMaterial, donutMaterial, sprinkleMeshes = []; // MODIFIED: Added donutMaterial, sprinkleMeshes
+            let scene, camera, renderer, donutGroup, glazeMaterial, donutMaterial, sprinkleMeshes = [];
             let isDragging = false;
             let previousPointerX = 0;
             let previousPointerY = 0;
             let initialPinchDistance = 0;
             let currentCameraZ = 10;
             let isThreeJSInitialized = false; 
-            let donutSpinSpeed = 0.005; // NEW: Control variable for spin speed
+            let donutSpinSpeed = 0.005;
 
             const MIN_ZOOM_Z = 3;
             const MAX_ZOOM_Z = 20;
 
             const glazeColors = [
-                0xFFC0CB, // Original Pink
-                0xADD8E6, // Light Blue
-                0x90EE90, // Light Green
-                0xFFD700, // Gold (Yellow)
-                0x800080, // Purple
-                0xFFF8DC, // Cream
-                0xFF0000, // Red
-                0x000000  // Black
+                0xFFC0CB, 0xADD8E6, 0x90EE90, 0xFFD700,
+                0x800080, 0xFFF8DC, 0xFF0000, 0x000000
             ];
             let currentGlazeColorIndex = 0;
 
-            const donutBaseColors = [ // NEW
-                0x5C3317, // Original Brown
-                0xDEB887, // BurlyWood (Lighter)
-                0x3D2B1F, // Dark Brown
-                0xF5DEB3, // Wheat
-                0xFFC0CB, // Pink (for fun)
-                null      // NEW: Wireframe flag
+            const donutBaseColors = [
+                0x5C3317, 0xDEB887, 0x3D2B1F, 0xF5DEB3, 0xFFC0CB, null
             ];
             let currentDonutBaseColorIndex = 0;
 
-            const sprinkleColorSets = [ // NEW: Sprinkle color sets
-                [0xFF0000, 0xFF7F00, 0xFFFF00, 0x00FF00, 0x0000FF, 0x4B0082, 0x9400D3], // Rainbow
-                [0xFFFFFF, 0xF0F0F0, 0xE0E0E0], // White/Silver
-                [0x000000, 0x333333, 0x666666], // Black/Grey
-                [0xFFC0CB, 0xFF9AA2, 0xFFDDE1], // Pink Tones
-                [0x87CEEB, 0xADD8E6, 0xB0E0E6], // Blue Tones
-                [0xDAA520, 0xB8860B, 0xFFD700]  // Gold Tones
+            const sprinkleColorSets = [
+                [0xFF0000, 0xFF7F00, 0xFFFF00, 0x00FF00, 0x0000FF, 0x4B0082, 0x9400D3],
+                [0xFFFFFF, 0xF0F0F0, 0xE0E0E0],
+                [0x000000, 0x333333, 0x666666],
+                [0xFFC0CB, 0xFF9AA2, 0xFFDDE1],
+                [0x87CEEB, 0xADD8E6, 0xB0E0E6],
+                [0xDAA520, 0xB8860B, 0xFFD700]
             ];
             let currentSprinkleColorSetIndex = 0;
 
@@ -951,7 +979,7 @@
                 return new THREE.CanvasTexture(canvas);
             }
 
-            function createSpeckleTexture(size = 512, color = 'rgba(0,0,0,0.5)') {
+            function createSpeckleTexture(size = 512) {
                 const canvas = document.createElement('canvas');
                 canvas.width = size;
                 canvas.height = size;
@@ -1004,7 +1032,6 @@
 
                 donutGroup = new THREE.Group();
                 
-                // Donut Base
                 const donutGeometry = new THREE.TorusGeometry(2.8, 1.3, 32, 100);
 
                 const crackTexture = createCrackTexture(1024);
@@ -1015,8 +1042,8 @@
                 speckleTexture.wrapS = speckleTexture.wrapT = THREE.RepeatWrapping;
                 speckleTexture.repeat.set(3, 3);
 
-                donutMaterial = new THREE.MeshStandardMaterial({ // MODIFIED: Assigned to global var
-                    color: donutBaseColors[currentDonutBaseColorIndex], // MODIFIED: Use color from array
+                donutMaterial = new THREE.MeshStandardMaterial({
+                    color: donutBaseColors[currentDonutBaseColorIndex],
                     roughness: 0.8,
                     metalness: 0.05,
                     map: speckleTexture,
@@ -1026,7 +1053,6 @@
                 const donutBase = new THREE.Mesh(donutGeometry, donutMaterial);
                 donutGroup.add(donutBase);
 
-                // Glaze Layer
                 const glazeRadius = 2.75; 
                 const glazeTubeRadius = 1.35; 
                 const radialSegments = 32; 
@@ -1089,19 +1115,16 @@
                 glaze.position.z = 0.05; 
                 donutGroup.add(glaze);
 
-                // Sprinkles (Initial creation)
-                createSprinkles(); // Refactored to a separate function
+                createSprinkles();
                 
                 scene.add(donutGroup);
 
-                // Add pointer listeners for Glazery
                 dom.glazery.canvas.addEventListener('pointerdown', onPointerDown);
                 dom.glazery.canvas.addEventListener('pointermove', onPointerMove);
                 dom.glazery.canvas.addEventListener('pointerup', onPointerUp);
                 dom.glazery.canvas.addEventListener('pointerleave', onPointerUp);
                 dom.glazery.canvas.addEventListener('wheel', onMouseWheel, { passive: false });
                 
-                // Setup zoom slider
                 dom.glazery.zoomSlider.min = MIN_ZOOM_Z;
                 dom.glazery.zoomSlider.max = MAX_ZOOM_Z;
                 dom.glazery.zoomSlider.value = currentCameraZ;
@@ -1111,7 +1134,6 @@
             }
 
             function createSprinkles() {
-                // Remove existing sprinkles if any
                 sprinkleMeshes.forEach(sprinkle => donutGroup.remove(sprinkle));
                 sprinkleMeshes = [];
 
@@ -1144,17 +1166,15 @@
                     sprinkle.rotateX(Math.PI / 2); 
                     sprinkle.rotation.z += Math.random() * Math.PI; 
                     donutGroup.add(sprinkle);
-                    sprinkleMeshes.push(sprinkle); // Store reference
+                    sprinkleMeshes.push(sprinkle);
                 }
             }
 
-
-            // ===============================================================
-            // UNIVERSAL 3D CONTROLS & ANIMATION
-            // ===============================================================
+            // =============================================================
+            // 3D CONTROLS & ANIMATION
+            // =============================================================
 
             function onResize() {
-                // Resize Glazery Canvas
                 if (renderer && camera && dom.glazery.rainContainer) {
                     const container = dom.glazery.rainContainer;
                     const w = container.clientWidth;
@@ -1171,15 +1191,11 @@
             function animate() {
                 requestAnimationFrame(animate);
                 
-                // Render Glazery if active - REMOVED activeView check
                 if (donutGroup && renderer) {
-                    // MODIFIED: Always spin based on donutSpinSpeed, remove isDragging check
                     donutGroup.rotation.y += donutSpinSpeed; 
                     
-                    // NEW: Add damping/friction to slow the spin down
                     if (donutSpinSpeed > 0.005) {
-                        donutSpinSpeed *= 0.95; // Apply friction
-                        // If it gets very close to the base speed, clamp it
+                        donutSpinSpeed *= 0.95;
                         if (donutSpinSpeed < 0.006) {
                             donutSpinSpeed = 0.005;
                         }
@@ -1189,7 +1205,6 @@
                 }
             }
 
-            // --- Glazery (Donut) Pointer Events ---
             let pointers = [];
 
             function getPinchDistance(e) {
@@ -1208,7 +1223,6 @@
                     previousPointerX = e.clientX;
                     previousPointerY = e.clientY;
                 }
-                // Removed else if for two fingers to simplify interaction to only rotation/zoom on the donut
                 dom.glazery.canvas.setPointerCapture(e.pointerId);
             }
 
@@ -1234,7 +1248,6 @@
                     currentCameraZ = newZ;
 
                 }
-                // MODIFIED: Allow rotation with one finger even if another is still down (pinch ended)
                 if (isDragging && pointers.length === 1) { 
                     const deltaX = e.clientX - previousPointerX;
                     const deltaY = e.clientY - previousPointerY;
@@ -1251,7 +1264,6 @@
                 pointers = pointers.filter(p => p.pointerId !== e.pointerId);
                 dom.glazery.canvas.releasePointerCapture(e.pointerId);
 
-                // No longer perform action on up, just stop dragging
                 if (isDragging && pointers.length === 0) {
                     isDragging = false;
                 }
@@ -1278,144 +1290,31 @@
                 }
             }
 
-            function changeDonutBaseColor() { // NEW
+            function changeDonutBaseColor() {
                 if (donutMaterial) {
                     currentDonutBaseColorIndex = (currentDonutBaseColorIndex + 1) % donutBaseColors.length;
                     const newColorOrMode = donutBaseColors[currentDonutBaseColorIndex];
 
                     if (newColorOrMode === null) {
-                        // Activate wireframe mode
                         donutMaterial.wireframe = true;
-                        // Set wireframe color to something visible (e.g., light cream, matches dark mode text)
                         donutMaterial.color.set(0xF5E6C1); 
                     } else {
-                        // Activate solid mode
                         donutMaterial.wireframe = false;
                         donutMaterial.color.set(newColorOrMode);
                     }
                 }
             }
 
-            function changeSprinkleColor() { // NEW
+            function changeSprinkleColor() {
                 currentSprinkleColorSetIndex = (currentSprinkleColorSetIndex + 1) % sprinkleColorSets.length;
-                createSprinkles(); // Recreate sprinkles with new color set
+                createSprinkles();
             }
 
-
-            // ===============================================================
-            // RENDER/UPDATE FUNCTIONS
-            // ===============================================================
-
-            const updateUI = () => {
-                // NEW: Calculate percentMined globally for both views
-                const { totalDonutSupply, totalCookiesCreated, nextHalvingAt, totalMiners } = state.global;
-                const percentMined = totalDonutSupply > 0 ? (totalCookiesCreated / totalDonutSupply) * 100 : 0;
-
-                // Update Glazery View (always, since it's the main view)
-                
-                // NEW: Update second row of stats
-                dom.glazery.donutBalance.textContent = '🍩 ' + format(state.player.cookies);
-                dom.glazery.totalGlazeTime.textContent = formatGlazeTime(state.player.totalGlazeTimeMs);
-                dom.glazery.percentMined.textContent = formatDecimal(percentMined);
-
-                // --- Update first row of stats ---
-                const bakeryCps = state.player.isBakerKing ? state.global.emissionRate : 0; 
-                dom.glazery.cps.textContent = formatDecimal(bakeryCps);
-                
-                if (state.player.isBakerKing && state.player.glazeStartTime) {
-                    const elapsedMs = Date.now() - state.player.glazeStartTime;
-                    dom.glazery.baked.textContent = formatGlazeTime(elapsedMs);
-                } else {
-                    dom.glazery.baked.textContent = '00:00:00';
-                }
-                
-                const claimableBakery = Math.floor(state.player.claimableBakeryCookies);
-                if (state.player.isBakerKing) {
-                    dom.glazery.kingStatus.textContent = 'You';
-                    dom.glazery.actionButton.textContent = `Bake ${format(claimableBakery)}`;
-                    dom.glazery.actionButton.disabled = claimableBakery < 1;
-                } else {
-                    dom.glazery.kingStatus.textContent = 'None';
-                    dom.glazery.actionButton.textContent = 'Glaze';
-                    dom.glazery.actionButton.disabled = false;
-                }
-                
-                // NEW: Calculate halving time (used in two places)
-                const blocksRemaining = nextHalvingAt - totalCookiesCreated;
-                const secondsRemaining = Math.max(0, Math.floor(blocksRemaining * (GAME_TICK_MS / 100))); 
-                const hours = Math.floor(secondsRemaining / 3600);
-                const minutes = Math.floor((secondsRemaining % 3600) / 60);
-                const seconds = secondsRemaining % 60;
-                const halvingTimeText = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-                // Update About Page Stats - REMOVED this entire block
-                
-                // NEW: Update Modal Stats (always, so it's fresh when opened)
-                if (dom.modalInfo.totalSupply) { // Check if elements exist
-                    dom.modalInfo.totalSupply.textContent = `🍩 ${format(totalDonutSupply)}`;
-                    dom.modalInfo.percentMined.textContent = `${formatDecimal(percentMined)}%`;
-                    dom.modalInfo.nextHalving.textContent = halvingTimeText;
-                    dom.modalInfo.totalMiners.textContent = `👤 ${format(totalMiners)}`;
-                }
-            };
-            
-            // REMOVED showView function
-
-            // ===============================================================
-            // GAME ACTIONS (NEW SECTION)
-            // ===============================================================
-
-            const handleMinerAction = () => {
-                donutSpinSpeed = 0.5; // NEW: Set spin speed to high!
-
-                if (state.player.isBakerKing) {
-                    // Claim "Bake"
-                    const claimable = Math.floor(state.player.claimableBakeryCookies);
-                    if (claimable > 0) {
-                        playSoundEffect('purchase');
-                        state.player.cookies += claimable;
-                        state.player.totalBakedCookies += claimable;
-                        state.player.claimableBakeryCookies = 0;
-                        console.log(`Claimed ${claimable} cookies.`);
-                    }
-                } else {
-                    // Become "Glazer" (King)
-                    playSoundEffect('purchase');
-                    state.player.isBakerKing = true;
-                    state.player.glazeStartTime = Date.now();
-                    console.log("You are now the King Glazer!");
-                }
-                
-                updateUI();
-            };
-
-            // ===============================================================
-            // GAME LOOP
-            // ===============================================================
-            
-            const GAME_TICK_MS = 100;
-
-            const gameLoop = () => {
-                // MOCK: Increment total mined cookies for countdown demo
-                state.global.totalCookiesCreated += state.global.emissionRate * (GAME_TICK_MS / 1000);
-                
-                // MOCK: Increment claimable cookies if king
-                if (state.player.isBakerKing) {
-                    const bakeryCps = state.global.emissionRate;
-                    state.player.claimableBakeryCookies += bakeryCps * (GAME_TICK_MS / 1000);
-                    state.player.totalGlazeTimeMs += GAME_TICK_MS; // NEW: Increment total glaze time
-                }
-                
-                updateUI();
-            };
-
-            // ===============================================================
+            // =============================================================
             // INITIALIZATION
-            // ===============================================================
+            // =============================================================
             
-            // REMOVED nav listeners
-            // NOTE: This will be replaced by handleMinerActionWithContract after contract integration loads
-            dom.glazery.actionButton.onclick = handleMinerAction;
+            dom.glazery.actionButton.onclick = handleGlazeClick;
             dom.musicToggleButton.onclick = toggleMusic;
             dom.sfxToggleButton.onclick = toggleSfx;
             dom.darkModeToggleButton.onclick = () => {
@@ -1426,16 +1325,15 @@
                 playSoundEffect('crunch');
                 changeGlazeColor();
             };
-            dom.glazery.sprinkleColorButton.onclick = () => { // NEW
+            dom.glazery.sprinkleColorButton.onclick = () => {
                 playSoundEffect('crunch');
                 changeSprinkleColor();
             };
-            dom.glazery.donutBaseColorButton.onclick = () => { // NEW
+            dom.glazery.donutBaseColorButton.onclick = () => {
                 playSoundEffect('crunch');
                 changeDonutBaseColor();
             };
 
-            // NEW MODAL LISTENERS
             dom.infoButton.onclick = showInfoModal;
             dom.infoModalClose.onclick = hideInfoModal;
             dom.infoModalOverlay.onclick = hideInfoModal;
@@ -1448,427 +1346,30 @@
                 currentCameraZ = newZ;
             };
 
-            // REMOVED showView('glazery');
-            setInterval(gameLoop, GAME_TICK_MS);
-            
-            if (!isThreeJSInitialized) {
-                setTimeout(initThreeJS, 0); 
-            }
-            
-            animate();
-        });
-
-        // =============================================================================
-        // CONTRACT INTEGRATION MODULE
-        // =============================================================================
-
-        // --- CONFIGURATION ---
-        // IMPORTANT: This points to your API deployment (not the game URL)
-        const API_BASE_URL = 'https://last-game-kappa.vercel.app'; // Your API Vercel deployment
-        const GAME_REFRESH_INTERVAL = 10000; // Refresh every 10 seconds
-
-        // --- CONTRACT DATA STATE ---
-        let contractData = {
-            currentMiner: null,
-            price: '0',
-            priceInEth: '0',
-            epochId: 0,
-            currentDps: '0',
-            currentDpsFormatted: '0',
-            nextDps: '0',
-            nextDpsFormatted: '0',
-            userDonutBalance: '0',
-            userDonutBalanceFormatted: '0',
-            userEthBalance: '0',
-            userEthBalanceFormatted: '0',
-            claimableDonuts: '0',
-            claimableDonutsFormatted: '0',
-            totalDonutSupply: '0',
-            totalDonutSupplyFormatted: '0',
-            secondsUntilHalving: 0,
-            timeAsMiner: 0,
-            userAddress: null
-        };
-
-        // --- HELPER FUNCTIONS ---
-
-        // Format numbers for display
-        function formatNumber(num) {
-            const n = parseFloat(num);
-            if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
-            if (n >= 1000) return (n / 1000).toFixed(2) + 'K';
-            return n.toFixed(2);
-        }
-
-        // Format time as HH:MM:SS
-        function formatTime(seconds) {
-            const h = Math.floor(seconds / 3600);
-            const m = Math.floor((seconds % 3600) / 60);
-            const s = seconds % 60;
-            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-        }
-
-        // --- FETCH GAME STATE FROM API ---
-        async function fetchGameState(userAddress = null) {
-            try {
-                const url = userAddress 
-                    ? `${API_BASE_URL}/api/get-game-state?userAddress=${userAddress}`
-                    : `${API_BASE_URL}/api/get-game-state`;
+            // Init blockchain
+            async function init() {
+                console.log('[Init] Starting...');
                 
-                console.log('[Contract] Fetching game state from:', url);
-                console.log('[Contract] Current origin:', window.location.origin);
-                
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    mode: 'cors',
-                    credentials: 'omit'
-                });
-                
-                console.log('[Contract] Fetch response status:', response.status);
-                console.log('[Contract] Fetch response ok:', response.ok);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                console.log('[Contract] Game state received:', data);
-                
-                // Update contract data
-                contractData = {
-                    ...contractData,
-                    ...data
-                };
-                
-                return data;
-            } catch (error) {
-                console.error('[Contract] Error fetching game state:', error);
-                console.error('[Contract] Error type:', error.name);
-                console.error('[Contract] Error message:', error.message);
-                
-                // Try to provide more helpful error info
-                if (error.message === 'Failed to fetch') {
-                    console.error('[Contract] This is likely a CORS or network issue');
-                    console.error('[Contract] Check that API is accessible and CORS is configured');
-                }
-                
-                return null;
-            }
-        }
-
-        // --- GET USER ADDRESS FROM FARCASTER CONTEXT ---
-        async function getUserAddress() {
-            try {
-                console.log('[Contract] Attempting to get user from Farcaster context...');
-                
-                // Method 1: Check for Farcaster frame context (injected by Farcaster)
-                if (window.frameContext && window.frameContext.user) {
-                    const fid = window.frameContext.user.fid;
-                    console.log('[Contract] User FID from frameContext:', fid);
-                    
-                    // Get address from Farcaster via API
-                    try {
-                        const response = await fetch(`https://api.neynar.com/v2/farcaster/user/bulk?fids=${fid}`, {
-                            headers: {
-                                'api_key': 'NEYNAR_ONCHAIN_KIT' // Public key for basic lookups
-                            }
-                        });
-                        const data = await response.json();
-                        if (data.users && data.users[0] && data.users[0].verified_addresses && data.users[0].verified_addresses.eth_addresses) {
-                            const address = data.users[0].verified_addresses.eth_addresses[0];
-                            console.log('[Contract] User address from Neynar:', address);
-                            contractData.userAddress = address;
-                            return address;
-                        }
-                    } catch (e) {
-                        console.log('[Contract] Could not fetch address from Neynar:', e.message);
-                    }
-                }
-                
-                // Method 2: Try Farcaster SDK as fallback
-                console.log('[Contract] Trying Farcaster SDK as fallback...');
-                try {
-                    const sdkImport = await Promise.race([
-                        import('https://esm.sh/@farcaster/miniapp-sdk'),
-                        new Promise((_, reject) => setTimeout(() => reject(new Error('SDK timeout')), 3000))
-                    ]);
-                    
-                    const sdk = sdkImport.default;
-                    await sdk.actions.ready();
-                    
-                    const provider = await sdk.wallet.getEthereumProvider();
-                    if (provider) {
-                        const accounts = await provider.request({ method: 'eth_requestAccounts' });
-                        const address = accounts[0];
-                        console.log('[Contract] User address from SDK:', address);
-                        contractData.userAddress = address;
-                        return address;
-                    }
-                } catch (sdkError) {
-                    console.log('[Contract] SDK fallback failed:', sdkError.message);
-                }
-                
-                console.log('[Contract] Could not get user address - continuing without it');
-                return null;
-                
-            } catch (error) {
-                console.log('[Contract] Error getting user address:', error.message);
-                return null;
-            }
-        }
-
-        // --- UPDATE UI WITH CONTRACT DATA ---
-        function updateUIFromContract() {
-            console.log('[Contract] Updating UI with contract data');
-            
-            // Check if state exists first
-            if (typeof state === 'undefined' || !state) {
-                console.log('[Contract] Game state not ready yet, skipping UI update');
-                return;
-            }
-            
-            console.log('[Contract] Forcing UI update with blockchain data...');
-            
-            // Update global state to reflect contract data
-            if (state && state.global) {
-                // Map contract data to game state
-                state.global.emissionRate = parseFloat(contractData.currentDpsFormatted);
-                state.global.totalDonutSupply = parseFloat(contractData.totalDonutSupplyFormatted);
-                state.global.totalCookiesCreated = parseFloat(contractData.totalDonutSupplyFormatted);
-                
-                console.log('[Contract] Set emission rate to:', state.global.emissionRate);
-                console.log('[Contract] Set total supply to:', state.global.totalDonutSupply);
-                
-                // Update player state
-                if (state.player) {
-                    state.player.cookies = parseFloat(contractData.userDonutBalanceFormatted);
-                    
-                    // Check if user is the current miner
-                    const userIsMiner = contractData.userAddress && 
-                                       contractData.currentMiner && 
-                                       contractData.userAddress.toLowerCase() === contractData.currentMiner.toLowerCase();
-                    
-                    state.player.isBakerKing = userIsMiner;
-                    
-                    console.log('[Contract] User is miner:', userIsMiner);
-                    console.log('[Contract] Current miner address:', contractData.currentMiner);
-                    console.log('[Contract] User address:', contractData.userAddress);
-                    
-                    if (userIsMiner) {
-                        state.player.claimableBakeryCookies = parseFloat(contractData.claimableDonutsFormatted);
-                        state.player.glazeStartTime = Date.now() - (contractData.timeAsMiner * 1000);
-                    } else {
-                        state.player.claimableBakeryCookies = 0;
-                        state.player.glazeStartTime = null;
-                    }
-                }
-            }
-            
-            // Force update the DOM directly with contract values
-            if (typeof dom !== 'undefined' && dom.glazery) {
-                // Update glaze price display
-                if (dom.glazery.currentPrice) {
-                    const priceInEth = parseFloat(contractData.priceInEth);
-                    dom.glazery.currentPrice.textContent = `$${priceInEth.toFixed(2)}`;
-                    console.log('[Contract] Updated price display to:', priceInEth);
-                }
-                
-                // Update donut balance display
-                if (dom.glazery.cookieCount) {
-                    const balance = parseFloat(contractData.userDonutBalanceFormatted);
-                    dom.glazery.cookieCount.textContent = `🍩 ${formatNumber(balance)}`;
-                    console.log('[Contract] Updated balance display to:', balance);
-                }
-            }
-            
-            // Update modal info if it exists
-            if (typeof dom !== 'undefined' && dom.modalInfo) {
-                if (dom.modalInfo.totalSupply) {
-                    dom.modalInfo.totalSupply.textContent = `🍩 ${formatNumber(contractData.totalDonutSupplyFormatted)}`;
-                }
-                if (dom.modalInfo.nextHalving) {
-                    dom.modalInfo.nextHalving.textContent = formatTime(contractData.secondsUntilHalving);
-                }
-                if (dom.modalInfo.totalMiners) {
-                    dom.modalInfo.totalMiners.textContent = `👤 1`; // Only one miner at a time
-                }
-            }
-            
-            // Trigger UI update
-            if (typeof updateUI === 'function') {
-                updateUI();
-            }
-            
-            console.log('[Contract] UI update complete');
-        }
-
-        // --- OPEN TRANSACTION FRAME ---
-        function openGlazeFrame() {
-            console.log('[Contract] Opening glaze transaction frame');
-            
-            // The payment-frame.js will handle the transaction
-            const frameUrl = `${API_BASE_URL}/api/payment-frame`;
-            
-            // Open in a new window (Farcaster will handle this appropriately)
-            window.open(frameUrl, '_blank');
-            
-            // Start polling for state changes after frame opens
-            setTimeout(() => {
-                console.log('[Contract] Starting refresh after frame opened');
-                startAutoRefresh();
-            }, 2000);
-        }
-
-        // --- AUTO REFRESH ---
-        let refreshInterval = null;
-
-        function startAutoRefresh() {
-            if (refreshInterval) {
-                clearInterval(refreshInterval);
-            }
-            
-            refreshInterval = setInterval(async () => {
-                console.log('[Contract] Auto-refreshing game state...');
-                await fetchGameState(contractData.userAddress);
-                updateUIFromContract();
-            }, GAME_REFRESH_INTERVAL);
-        }
-
-        function stopAutoRefresh() {
-            if (refreshInterval) {
-                clearInterval(refreshInterval);
-                refreshInterval = null;
-            }
-        }
-
-        // --- INITIALIZATION ---
-        async function initContractIntegration() {
-            console.log('[Contract] Initializing contract integration...');
-            
-            // Wait for dom to be defined
-            let attempts = 0;
-            while (typeof dom === 'undefined' && attempts < 50) {
-                console.log('[Contract] Waiting for DOM to be ready... attempt', attempts + 1);
-                await new Promise(resolve => setTimeout(resolve, 100));
-                attempts++;
-            }
-            
-            if (typeof dom === 'undefined') {
-                console.error('[Contract] DOM never became ready!');
-            } else {
-                console.log('[Contract] DOM is ready!');
-            }
-            
-            try {
-                // Get user address (may fail if not in Farcaster)
+                // Get user address
                 const userAddress = await getUserAddress();
                 
-                // Fetch initial game state (should always work)
-                console.log('[Contract] Fetching game state...');
-                const gameState = await fetchGameState(userAddress);
+                // Fetch initial state
+                await fetchGameState(userAddress);
                 
-                if (!gameState) {
-                    console.error('[Contract] Failed to fetch game state - will retry');
-                    // Try again without user address
-                    await fetchGameState(null);
-                }
+                // Auto-refresh
+                setInterval(() => {
+                    console.log('[Init] Auto-refreshing...');
+                    fetchGameState(blockchainData.userAddress);
+                }, REFRESH_INTERVAL);
                 
-                // Update UI
-                updateUIFromContract();
-                
-                // CRITICAL: Replace the button handler NOW
-                console.log('[Contract] Replacing button handler...');
-                if (typeof dom !== 'undefined' && dom.glazery && dom.glazery.actionButton) {
-                    dom.glazery.actionButton.onclick = handleMinerActionWithContract;
-                    console.log('[Contract] Button handler replaced successfully');
-                } else {
-                    console.error('[Contract] Could not find button to replace!');
-                }
-                
-                // Start auto refresh
-                startAutoRefresh();
-                
-                console.log('[Contract] Contract integration initialized successfully');
-            } catch (error) {
-                console.error('[Contract] Error during initialization:', error);
-                console.log('[Contract] Will continue with limited functionality');
-                
-                // Try to at least fetch game state without user
-                try {
-                    await fetchGameState(null);
-                    updateUIFromContract();
-                    
-                    // Try to replace button even if initialization failed
-                    if (typeof dom !== 'undefined' && dom.glazery && dom.glazery.actionButton) {
-                        dom.glazery.actionButton.onclick = handleMinerActionWithContract;
-                    }
-                    
-                    startAutoRefresh();
-                } catch (e) {
-                    console.error('[Contract] Critical error - cannot fetch game state:', e);
-                }
-            }
-        }
-
-        // --- OVERRIDE GLAZE BUTTON HANDLER ---
-        // This replaces the mock handleMinerAction with real contract interaction
-        const originalHandleMinerAction = typeof handleMinerAction !== 'undefined' ? handleMinerAction : null;
-
-        function handleMinerActionWithContract() {
-            console.log('[Contract] Glaze button clicked');
-            
-            // Spin the donut!
-            if (typeof donutSpinSpeed !== 'undefined') {
-                donutSpinSpeed = 0.5;
+                console.log('[Init] Complete!');
             }
             
-            // Check if user is current miner
-            const userIsMiner = contractData.userAddress && 
-                               contractData.currentMiner && 
-                               contractData.userAddress.toLowerCase() === contractData.currentMiner.toLowerCase();
-            
-            if (userIsMiner) {
-                // User is miner, but rewards are auto-claimed when someone else takes over
-                alert('You are the current miner! Your rewards will be claimed automatically when someone else takes over.');
-            } else {
-                // User wants to become miner - open transaction frame
-                openGlazeFrame();
-            }
-        }
-
-        // Replace the glaze button handler
-        if (typeof handleMinerAction !== 'undefined') {
-            // Save original
-            window.originalHandleMinerAction = handleMinerAction;
-            // Replace with contract version
-            window.handleMinerAction = handleMinerActionWithContract;
-            handleMinerAction = handleMinerActionWithContract;
-        }
-
-        // --- EXPORT FOR GLOBAL ACCESS ---
-        window.contractIntegration = {
-            fetchGameState,
-            getUserAddress,
-            updateUIFromContract,
-            openGlazeFrame,
-            startAutoRefresh,
-            stopAutoRefresh,
-            initContractIntegration,
-            contractData,
-            formatNumber,
-            formatTime
-        };
-
-        console.log('[Contract] Contract integration module loaded.');
-        
-        // Initialize after a short delay to ensure game is fully loaded
-        setTimeout(() => {
-            console.log('[Contract] Starting initialization after delay...');
-            initContractIntegration();
-        }, 1000);
+            // Start everything
+            setTimeout(initThreeJS, 0);
+            animate();
+            init();
+        });
     </script>
 </body>
 </html>
