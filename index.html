@@ -696,23 +696,18 @@
         
         console.log('[Blockchain] Fetching transaction data...');
         
-        const context = await sdk.context;
-        const fid = context?.user?.fid || blockchainData.fid || 0;
-        const address = blockchainData.userAddress;
+        const address = blockchainData.userAddress; // User's wallet address
         
         if (!address) {
             alert('Please connect your wallet first');
             return;
         }
         
-        console.log('[Blockchain] Using FID:', fid, 'Address:', address);
-        
-        // Get transaction data from your API - using GET with query params instead of POST
+        // 1. Fetch transaction data from your API
+        // Using GET with query param 'player' as implemented
         const txDataResponse = await fetch(`${API_BASE_URL}/api/transaction?player=${address}`, {
             method: 'GET',
-            headers: { 
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             mode: 'cors'
         });
         
@@ -725,37 +720,32 @@
         const txData = await txDataResponse.json();
         console.log('[Blockchain] Transaction data received:', txData);
         
-        // CRITICAL FIX: Ensure value is in proper hex format
-        let valueToSend = txData.params.value;
-        
-        if (valueToSend && !valueToSend.startsWith('0x')) {
-            valueToSend = '0x' + BigInt(valueToSend).toString(16);
-            console.log('[Blockchain] Converted value to hex:', valueToSend);
-        }
-        
-        if (!valueToSend || valueToSend === '0' || valueToSend === '') {
-            valueToSend = '0x0';
-            console.log('[Blockchain] Set value to 0x0');
-        }
-        
-        console.log('[Blockchain] Final value to send:', valueToSend);
-        
+        // --- FIX 1 & 2: CORRECT CHAIN ID AND ADD 'from' FIELD ---
         const provider = await sdk.wallet.getEthereumProvider();
         
         if (!provider) {
             throw new Error('Wallet provider not available');
         }
         
-        const chainIdHex = '0x2105';
+        // Base Mainnet Chain ID is 8453, which is 0x2104 in hex.
+        // Your contract is on mainnet, so this must be correct.
+        const chainIdHex = '0x2104'; 
         
         console.log('[Blockchain] Sending transaction...');
+        
         const txHash = await provider.request({
             method: 'eth_sendTransaction',
             params: [{
+                // 2. Added 'from' address (the user's wallet)
+                from: address, 
                 to: txData.params.to,
                 data: txData.params.data,
-                value: valueToSend,
-                chainId: chainIdHex
+                // 3. Removed redundant 'value' conversion logic.
+                // The server already returns txData.params.value as the correct '0x...' hex string.
+                value: txData.params.value, 
+                // Note: The 'chainId' is often optional here, but including it in the request 
+                // can ensure the wallet is on the right network. We use the correct mainnet hex.
+                chainId: chainIdHex 
             }]
         });
         
