@@ -583,7 +583,7 @@
                     return txHash; // Success! Return hash.
 
                 } catch (error) {
-                    // Check for specific soft errors (like timeout, request queueing)
+                    // Only retry on communication/timeout errors, otherwise assume contract revert/user rejection
                     const isRetryable = error.message.includes('timeout') || error.message.includes('Queue is full') || error.message.includes('JSON RPC');
 
                     if (!isRetryable || i === maxAttempts - 1) {
