@@ -6,10 +6,10 @@
   },
   "miniapp": {
     "version": "1",
-    "name": "Pinky Glazers Donut Shop",
-    "iconUrl": "https://i.imgur.com/IHAbVrG.png",
-    "homeUrl": "https://i.imgur.com/IHAbVrG.png",
-    "splashImageUrl": "https://i.imgur.com/IHAbVrG.png",
+    "name": "Dillinger Space Commando 95",
+    "iconUrl": "https://dillinger-final.vercel.app/public/png95.png",
+    "homeUrl": "https://dillinger-final.vercel.app",
+    "splashImageUrl": "https://dillinger-final.vercel.app/public/png95.png",
     "splashBackgroundColor": "#000000"
   }
 }
