@@ -674,19 +674,35 @@
                 }
             }
 
-            function openGlazeFrame() {
-                console.log('[Blockchain] Opening glaze frame');
+            async function openGlazeFrame() {
+                console.log('[Blockchain] Opening transaction in Farcaster...');
                 donutSpinSpeed = 0.5; // Spin the donut!
                 playSoundEffect('purchase');
                 
-                const frameUrl = `${API_BASE_URL}/api/payment-frame`;
-                window.open(frameUrl, '_blank');
-                
-                // Refresh state after transaction
-                setTimeout(() => {
-                    console.log('[Blockchain] Refreshing after transaction...');
-                    fetchGameState(blockchainData.userAddress);
-                }, 3000);
+                try {
+                    // Import Farcaster SDK
+                    const { default: sdk } = await import('https://esm.sh/@farcaster/miniapp-sdk');
+                    
+                    // Build transaction frame URL
+                    const frameUrl = `${API_BASE_URL}/api/payment-frame`;
+                    
+                    console.log('[Blockchain] Opening frame:', frameUrl);
+                    
+                    // Open the frame in Farcaster
+                    await sdk.actions.openUrl(frameUrl);
+                    
+                    // Refresh state after transaction
+                    setTimeout(() => {
+                        console.log('[Blockchain] Refreshing after transaction...');
+                        fetchGameState(blockchainData.userAddress);
+                    }, 3000);
+                    
+                } catch (error) {
+                    console.error('[Blockchain] Error opening transaction:', error);
+                    // Fallback to window.open if SDK fails
+                    const frameUrl = `${API_BASE_URL}/api/payment-frame`;
+                    window.open(frameUrl, '_blank');
+                }
             }
 
             function handleGlazeClick() {
