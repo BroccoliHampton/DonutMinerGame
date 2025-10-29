@@ -823,12 +823,15 @@
                                    blockchainData.userAddress.toLowerCase() === blockchainData.currentMiner.toLowerCase();
                 
                 // --- KING GLAZER DISPLAY FIX (FIX 3) ---
-                let kingGlazerDisplay;
+               let kingGlazerDisplay;
 
                 if (userIsMiner) {
                     kingGlazerDisplay = 'You';
+                } else if (blockchainData.currentMinerUsername) {
+                    // FIX: Display the fetched Farcaster username
+                    kingGlazerDisplay = `@${blockchainData.currentMinerUsername}`;
                 } else if (blockchainData.currentMiner && blockchainData.currentMiner !== '0x0000000000000000000000000000000000000000') {
-                    // Display shortened address if it's a valid, non-zero address
+                    // Fallback: Display the shortened address if username lookup fails
                     const address = blockchainData.currentMiner;
                     kingGlazerDisplay = `${address.slice(0, 6)}...${address.slice(-4)}`;
                 } else {
