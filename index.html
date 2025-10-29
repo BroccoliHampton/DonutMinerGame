@@ -851,7 +851,8 @@
 
                 dom.glazery.donutBalance.textContent = `🍩 ${formatNumber(blockchainData.userDonutBalanceFormatted || 0)}`;
                 dom.glazery.totalSupply.textContent = `🍩 ${formatNumber(blockchainData.totalDonutSupplyFormatted || 0)}`;
-                dom.glazery.currentDps.textContent = formatNumber(blockchainData.currentDpsFormatted || 0);
+                // FIX: Use high precision (toFixed(2)) and force formatting without the helper's K/M logic.
+                dom.glazery.currentDps.textContent = parseFloat(blockchainData.currentDpsFormatted || 0).toFixed(2);
                 
                 // Update button: Always set to Glaze (FIX 5)
                 dom.glazery.actionButton.textContent = 'Glaze';
