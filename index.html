@@ -1642,12 +1642,17 @@
                 return;
             }
             
+            console.log('[Contract] Forcing UI update with blockchain data...');
+            
             // Update global state to reflect contract data
             if (state && state.global) {
                 // Map contract data to game state
                 state.global.emissionRate = parseFloat(contractData.currentDpsFormatted);
                 state.global.totalDonutSupply = parseFloat(contractData.totalDonutSupplyFormatted);
-                state.global.totalCookiesCreated = parseFloat(contractData.totalDonutSupplyFormatted); // Simplified
+                state.global.totalCookiesCreated = parseFloat(contractData.totalDonutSupplyFormatted);
+                
+                console.log('[Contract] Set emission rate to:', state.global.emissionRate);
+                console.log('[Contract] Set total supply to:', state.global.totalDonutSupply);
                 
                 // Update player state
                 if (state.player) {
@@ -1660,6 +1665,10 @@
                     
                     state.player.isBakerKing = userIsMiner;
                     
+                    console.log('[Contract] User is miner:', userIsMiner);
+                    console.log('[Contract] Current miner address:', contractData.currentMiner);
+                    console.log('[Contract] User address:', contractData.userAddress);
+                    
                     if (userIsMiner) {
                         state.player.claimableBakeryCookies = parseFloat(contractData.claimableDonutsFormatted);
                         state.player.glazeStartTime = Date.now() - (contractData.timeAsMiner * 1000);
@@ -1667,6 +1676,23 @@
                         state.player.claimableBakeryCookies = 0;
                         state.player.glazeStartTime = null;
                     }
+                }
+            }
+            
+            // Force update the DOM directly with contract values
+            if (typeof dom !== 'undefined' && dom.glazery) {
+                // Update glaze price display
+                if (dom.glazery.currentPrice) {
+                    const priceInEth = parseFloat(contractData.priceInEth);
+                    dom.glazery.currentPrice.textContent = `$${priceInEth.toFixed(2)}`;
+                    console.log('[Contract] Updated price display to:', priceInEth);
+                }
+                
+                // Update donut balance display
+                if (dom.glazery.cookieCount) {
+                    const balance = parseFloat(contractData.userDonutBalanceFormatted);
+                    dom.glazery.cookieCount.textContent = `🍩 ${formatNumber(balance)}`;
+                    console.log('[Contract] Updated balance display to:', balance);
                 }
             }
             
@@ -1687,6 +1713,8 @@
             if (typeof updateUI === 'function') {
                 updateUI();
             }
+            
+            console.log('[Contract] UI update complete');
         }
 
         // --- OPEN TRANSACTION FRAME ---
@@ -1749,6 +1777,15 @@
                 // Update UI
                 updateUIFromContract();
                 
+                // CRITICAL: Replace the button handler NOW
+                console.log('[Contract] Replacing button handler...');
+                if (dom && dom.glazery && dom.glazery.actionButton) {
+                    dom.glazery.actionButton.onclick = handleMinerActionWithContract;
+                    console.log('[Contract] Button handler replaced successfully');
+                } else {
+                    console.error('[Contract] Could not find button to replace!');
+                }
+                
                 // Start auto refresh
                 startAutoRefresh();
                 
@@ -1761,6 +1798,12 @@
                 try {
                     await fetchGameState(null);
                     updateUIFromContract();
+                    
+                    // Try to replace button even if initialization failed
+                    if (dom && dom.glazery && dom.glazery.actionButton) {
+                        dom.glazery.actionButton.onclick = handleMinerActionWithContract;
+                    }
+                    
                     startAutoRefresh();
                 } catch (e) {
                     console.error('[Contract] Critical error - cannot fetch game state:', e);
