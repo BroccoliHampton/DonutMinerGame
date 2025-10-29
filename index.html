@@ -687,17 +687,15 @@
 
             async function openGlazeFrame() {
     console.log('[Blockchain] Starting transaction...');
-    donutSpinSpeed = 0.5; // Spin the donut!
+    donutSpinSpeed = 0.5;
     playSoundEffect('purchase');
     
     try {
-        // Import Farcaster SDK
         const { default: sdk } = await import('https://esm.sh/@farcaster/miniapp-sdk');
         await sdk.actions.ready();
         
         console.log('[Blockchain] Fetching transaction data...');
         
-        // Get FID and address
         const context = await sdk.context;
         const fid = context?.user?.fid || blockchainData.fid || 0;
         const address = blockchainData.userAddress;
@@ -709,19 +707,13 @@
         
         console.log('[Blockchain] Using FID:', fid, 'Address:', address);
         
-        // Get transaction data from your API
-        const txDataResponse = await fetch(`${API_BASE_URL}/api/transaction`, {
-            method: 'POST',
+        // Get transaction data from your API - using GET with query params instead of POST
+        const txDataResponse = await fetch(`${API_BASE_URL}/api/transaction?player=${address}`, {
+            method: 'GET',
             headers: { 
                 'Content-Type': 'application/json'
             },
-            mode: 'cors',
-            body: JSON.stringify({
-                untrustedData: {
-                    fid: fid,
-                    address: address
-                }
-            })
+            mode: 'cors'
         });
         
         if (!txDataResponse.ok) {
@@ -733,16 +725,14 @@
         const txData = await txDataResponse.json();
         console.log('[Blockchain] Transaction data received:', txData);
         
-        // ✅ CRITICAL FIX: Ensure value is in proper hex format
+        // CRITICAL FIX: Ensure value is in proper hex format
         let valueToSend = txData.params.value;
         
-        // If it's a string number like "12300000000000000", convert to hex
         if (valueToSend && !valueToSend.startsWith('0x')) {
             valueToSend = '0x' + BigInt(valueToSend).toString(16);
             console.log('[Blockchain] Converted value to hex:', valueToSend);
         }
         
-        // If value is missing or "0", ensure it's "0x0"
         if (!valueToSend || valueToSend === '0' || valueToSend === '') {
             valueToSend = '0x0';
             console.log('[Blockchain] Set value to 0x0');
@@ -750,15 +740,13 @@
         
         console.log('[Blockchain] Final value to send:', valueToSend);
         
-        // Send transaction using Farcaster wallet
         const provider = await sdk.wallet.getEthereumProvider();
         
         if (!provider) {
             throw new Error('Wallet provider not available');
         }
         
-        // Convert chainId string to hex number for eth_sendTransaction
-        const chainIdHex = '0x2105'; // Base mainnet = 8453 = 0x2105
+        const chainIdHex = '0x2105';
         
         console.log('[Blockchain] Sending transaction...');
         const txHash = await provider.request({
@@ -766,17 +754,15 @@
             params: [{
                 to: txData.params.to,
                 data: txData.params.data,
-                value: valueToSend, // ✅ NOW USING PROPERLY FORMATTED HEX VALUE
+                value: valueToSend,
                 chainId: chainIdHex
             }]
         });
         
         console.log('[Blockchain] Transaction sent:', txHash);
         
-        // Show success message
         alert('Transaction submitted! Refreshing game state...');
         
-        // Refresh state after transaction
         setTimeout(() => {
             console.log('[Blockchain] Refreshing after transaction...');
             fetchGameState(blockchainData.userAddress);
