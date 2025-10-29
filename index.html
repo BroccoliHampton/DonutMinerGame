@@ -675,7 +675,7 @@
             }
 
             async function openGlazeFrame() {
-                console.log('[Blockchain] Opening transaction in Farcaster...');
+                console.log('[Blockchain] Starting transaction...');
                 donutSpinSpeed = 0.5; // Spin the donut!
                 playSoundEffect('purchase');
                 
@@ -683,13 +683,44 @@
                     // Import Farcaster SDK
                     const { default: sdk } = await import('https://esm.sh/@farcaster/miniapp-sdk');
                     
-                    // Build transaction frame URL
-                    const frameUrl = `${API_BASE_URL}/api/payment-frame`;
+                    console.log('[Blockchain] Fetching transaction data...');
                     
-                    console.log('[Blockchain] Opening frame:', frameUrl);
+                    // Get transaction data from your API
+                    const txDataResponse = await fetch(`${API_BASE_URL}/api/transaction`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            untrustedData: {
+                                fid: blockchainData.userAddress ? 1 : 0, // Will be replaced by actual FID
+                                address: blockchainData.userAddress
+                            }
+                        })
+                    });
                     
-                    // Open the frame in Farcaster
-                    await sdk.actions.openUrl(frameUrl);
+                    if (!txDataResponse.ok) {
+                        throw new Error('Failed to get transaction data');
+                    }
+                    
+                    const txData = await txDataResponse.json();
+                    console.log('[Blockchain] Transaction data:', txData);
+                    
+                    // Send transaction using Farcaster wallet
+                    const provider = await sdk.wallet.getEthereumProvider();
+                    
+                    const txHash = await provider.request({
+                        method: 'eth_sendTransaction',
+                        params: [{
+                            to: txData.params.to,
+                            data: txData.params.data,
+                            value: txData.params.value,
+                            chainId: txData.chainId
+                        }]
+                    });
+                    
+                    console.log('[Blockchain] Transaction sent:', txHash);
+                    
+                    // Show success message
+                    alert('Transaction submitted! Refreshing game state...');
                     
                     // Refresh state after transaction
                     setTimeout(() => {
@@ -698,10 +729,8 @@
                     }, 3000);
                     
                 } catch (error) {
-                    console.error('[Blockchain] Error opening transaction:', error);
-                    // Fallback to window.open if SDK fails
-                    const frameUrl = `${API_BASE_URL}/api/payment-frame`;
-                    window.open(frameUrl, '_blank');
+                    console.error('[Blockchain] Transaction error:', error);
+                    alert(`Transaction failed: ${error.message}`);
                 }
             }
 
