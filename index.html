@@ -586,7 +586,7 @@
         const REFRESH_INTERVAL = 10000; // 10 seconds
         
         // CONTRACT ADDRESSES - UPDATED FOR NEW MULTICALL
-        const MULTICALL_ADDRESS = '0x3eE553912ba4262Ddd955DD5F910bA0844B16278';
+        const MULTICALL_ADDRESS = '0xe03a89eb8b75d73Caf762a81dA260106fD42F18A';
         const LP_TOKEN_ADDRESS = '0xc3b9bd6f7d4bfcc22696a7bc1cc83948a33d7fab';
 
         // =================================================================
@@ -1233,7 +1233,7 @@
                     envelope: { attack: 0.001, decay: 0.3, sustain: 0.01, release: 0.2 }
                 }).connect(limiter);
                 
-                const kickPattern = ['C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'GC5', null];
+                const kickPattern = ['C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'GC5', null];
                 
                 kickSequence = new Tone.Sequence((time, note) => {
                     if (note) kick.triggerAttackRelease(note, '8n', time);
