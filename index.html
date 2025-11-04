@@ -278,7 +278,7 @@
         
         body.dark {
             background-color: #5C3317;
-            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%236B4A34' fill-opacity='0.4'%3E%3Cpath d='M10 0L0 10l10 10 10-10z'/%E3%80%89%3Cpath d='M0 10L10 20l10-10L10 0z'/%3E%3C/g%3E%3C/svg%3E"), 
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%236B4A34' fill-opacity='0.4'%3E%3Cpath d='M10 0L0 10l10 10 10-10z'/%E3%80%89%3Cpath d='M0 10L10 20l10-10L10 0z'/%E3%80%89%3C/g%3E%3C/svg%3E"), 
                             linear-gradient(135deg, #5C3317 0%, #3D2B1F 100%);
         }
 
@@ -461,15 +461,25 @@
                 </div>
             </div>
 
-            <!-- START Duplicated Blaze Price Container -->
+            <!-- START Duplicated Blaze Price Container with CLAIM field -->
             <div class="bg-tamagotchi-card text-tamagotchi-dark p-2 rounded-tamagotchi-lg shadow-tamagotchi mt-2">
                 <div class="flex justify-between items-center">
+                    <!-- Left Column: Blaze Price -->
                     <div>
-                        <div class="text-xs font-semibold text-gray-600">Blaze Price</div>
-                        <!-- Placeholder IDs: We duplicate the IDs to hold the spot, but they won't be wired up in the JS yet. -->
-                        <div id="blaze-price-display" class="text-xl font-extrabold text-tamagotchi-dark">$0.00</div>
-                        <div id="blaze-available-balance-display" class="text-xs text-gray-500">$0.00 available</div>
+                        <div class="text-xs font-semibold text-gray-600">Blaze Price (LP)</div>
+                        <div id="blaze-price-display" class="text-xl font-extrabold text-tamagotchi-dark">0.00</div>
+                        <div id="blaze-available-balance-display" class="text-xs text-gray-500">0.00 LP available</div>
                     </div>
+                    
+                    <!-- Middle Column: Claimable ETH -->
+                    <div class="text-center ml-2">
+                        <div class="text-xs font-semibold text-gray-600">Claim</div>
+                        <!-- NEW ID for claim amount -->
+                        <div id="blaze-claim-amount" class="text-lg font-extrabold text-tamagotchi-dark">0.00 ETH</div>
+                        <div class="text-xs text-gray-500 invisible">Placeholder</div> <!-- Invisible line for alignment -->
+                    </div>
+
+                    <!-- Right Column: Blaze Action Button -->
                     <!-- Placeholder ID: This button needs a new ID for the new action -->
                     <button id="blaze-action-button" class="bg-tamagotchi-button-teal text-white py-2 px-6 rounded-tamagotchi-md text-sm font-bold active:opacity-80 disabled:opacity-50 shadow-tamagotchi">
                         Blaze
@@ -526,7 +536,7 @@
                     <span id="modal-next-halving" class="font-extrabold text-tamagotchi-dark">--:--:--</span>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="text-sm font-semibold text-gray-600">Current Miner</span>
+                    <span id="modal-current-miner-label" class="text-sm font-semibold text-gray-600">Current Miner</span>
                     <span id="modal-current-miner" class="font-extrabold text-tamagotchi-dark text-xs">None</span>
                 </div>
             </div>
@@ -651,10 +661,11 @@
                     totalSupply: document.getElementById('total-supply-display'),
                     currentDps: document.getElementById('current-dps-display'),
                     
-                    // NEW: Blaze elements (Placeholders for now)
+                    // NEW: Blaze elements
                     blazePrice: document.getElementById('blaze-price-display'),
                     blazeAvailableBalance: document.getElementById('blaze-available-balance-display'),
                     blazeActionButton: document.getElementById('blaze-action-button'),
+                    blazeClaimAmount: document.getElementById('blaze-claim-amount'), // NEW ELEMENT
                 },
                 profileName: document.getElementById('player-profile-name'),
                 musicToggleButton: document.getElementById('music-toggle-button'),
@@ -881,13 +892,23 @@
                 // Available Balance display (FIXED PRECISION & UNIT - FIX 4)
                 dom.glazery.availableBalance.textContent = `${parseFloat(blockchainData.userEthBalanceFormatted || 0).toFixed(4)} ETH available`;
 
-                // NEW: Update Blaze Price with the same placeholder data for now
+                // NEW: Update Blaze Price (LP label and no dollar sign)
                 if (dom.glazery.blazePrice) {
-                    dom.glazery.blazePrice.textContent = `$${(parseFloat(blockchainData.priceInEth || 0) * 100).toFixed(2)} BLAZE`; // Slightly different data for visibility
+                    // Placeholder value: same as glaze price ETH, no currency sign
+                    dom.glazery.blazePrice.textContent = `${parseFloat(blockchainData.priceInEth || 0).toFixed(6)}`; 
                 }
+                // NEW: Update Blaze Available Balance (LP label)
                 if (dom.glazery.blazeAvailableBalance) {
-                     dom.glazery.blazeAvailableBalance.textContent = `${parseFloat(blockchainData.userEthBalanceFormatted || 0).toFixed(4)} ETH available`;
+                     dom.glazery.blazeAvailableBalance.textContent = `${parseFloat(blockchainData.userEthBalanceFormatted || 0).toFixed(4)} LP available`;
                 }
+                
+                // NEW: Update Blaze Claim Amount (Placeholder value)
+                if (dom.glazery.blazeClaimAmount) {
+                    // Placeholder: use user's claimable donuts * 0.001 as a mock ETH value
+                    const mockClaimEth = (parseFloat(blockchainData.claimableDonutsFormatted || 0) * 0.001).toFixed(6);
+                    dom.glazery.blazeClaimAmount.textContent = `${mockClaimEth} ETH`;
+                }
+
 
                 dom.glazery.donutBalance.textContent = `🍩 ${formatNumber(blockchainData.userDonutBalanceFormatted || 0)}`;
                 dom.glazery.totalSupply.textContent = `🍩 ${formatNumber(blockchainData.totalDonutSupplyFormatted || 0)}`;
