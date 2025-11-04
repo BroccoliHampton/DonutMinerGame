@@ -1035,10 +1035,25 @@
                         // Update approval status only after confirmation
                         blockchainData.blaze.userNeedsApproval = false;
                         updateBlazeryUI();
-                        console.log('Approval confirmed! Click Blaze again to proceed.');
+                        console.log('[Blaze] ✅ Approval confirmed! Automatically proceeding to buy transaction...');
                         
-                        // Final refresh
-                        fetchGameState(blockchainData.userAddress);
+                        // Refresh state first to get latest data
+                        await fetchGameState(blockchainData.userAddress);
+                        
+                        // Check if user has enough LP tokens
+                        const lpBalance = parseFloat(blockchainData.blaze.userLpBalanceFormatted || blockchainData.blaze.userLpBalance);
+                        const lpNeeded = parseFloat(blockchainData.blaze.priceFormatted || blockchainData.blaze.price);
+                        
+                        if (lpBalance < lpNeeded) {
+                            console.log('[Blaze] ⚠️ Insufficient LP balance after approval');
+                            console.log(`Need ${lpNeeded.toFixed(4)} LP but only have ${lpBalance.toFixed(4)} LP`);
+                            return;
+                        }
+                        
+                        // Automatically send buy transaction
+                        console.log('[Blaze] Sending buy transaction automatically...');
+                        await sendBuyTransaction(address);
+                        
                     } else {
                         console.log('[Blaze] ⚠️ Approval transaction sent but not yet confirmed. Please wait and try again.');
                     }
