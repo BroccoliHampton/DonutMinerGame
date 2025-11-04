@@ -383,16 +383,14 @@
             background: #3D2B1F;
             border-color: #FF9AA2;
         }
-
+        
         /* CUSTOM TOGGLE STYLES */
-        /* Ensures the label/toggle combo stays aligned */
         .price-line {
             display: flex;
             align-items: center; 
             justify-content: flex-start; 
         }
         
-        /* The switch itself */
         .toggle-switch-button {
             display: flex;
             align-items: center; 
@@ -428,7 +426,17 @@
             justify-content: flex-end; 
         }
         
-        /* General content stacking structure */
+        /* Layout Fixes: Ensure containers stack normally */
+        #glaze-container, #blaze-container {
+            width: 100%;
+            padding: 12px;
+        }
+        
+        #blaze-container {
+             /* Add margin back for separation in normal flow */
+             margin-top: 8px;
+        }
+
         .main-content {
             display: flex;
             justify-content: space-between;
@@ -510,7 +518,7 @@
                 </div>
             </div>
             
-            <div id="glaze-container" class="bg-tamagotchi-card text-tamagotchi-dark rounded-tamagotchi-lg shadow-tamagotchi mt-2">
+            <div id="glaze-container" class="bg-tamagotchi-card text-tamagotchi-dark rounded-tamagotchi-lg shadow-tamagotchi">
                 <div class="main-content">
                     
                     <div class="price-details">
@@ -531,22 +539,6 @@
                         Glaze
                     </button>
                 </div>
-
-                <div class="bg-tamagotchi-card rounded-tamagotchi-lg p-2 grid grid-cols-3 gap-2 mt-2">
-                    <div class="text-center">
-                        <div class="text-xs text-gray-500 font-semibold">Donut Balance</div>
-                        <div id="player-donut-balance" class="font-extrabold text-sm truncate text-tamagotchi-dark">🍩 0</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-xs text-gray-500 font-semibold">Total Supply</div>
-                        <div id="total-supply-display" class="font-extrabold text-sm text-tamagotchi-dark">🍩 0</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-xs text-gray-500 font-semibold">DPS</div>
-                        <div id="current-dps-display" class="font-extrabold text-sm text-tamagotchi-dark">0</div>
-                    </div>
-                </div>
-
             </div>
 
             <div id="blaze-container" class="bg-tamagotchi-card text-tamagotchi-dark rounded-tamagotchi-lg shadow-tamagotchi hidden mt-2">
@@ -577,7 +569,22 @@
                 </div>
             </div>
             
+            <div class="bg-tamagotchi-card rounded-tamagotchi-lg shadow-tamagotchi p-2 grid grid-cols-3 gap-2 mt-2">
+                <div class="text-center">
+                    <div class="text-xs text-gray-500 font-semibold">Donut Balance</div>
+                    <div id="player-donut-balance" class="font-extrabold text-sm truncate text-tamagotchi-dark">🍩 0</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-xs text-gray-500 font-semibold">Total Supply</div>
+                    <div id="total-supply-display" class="font-extrabold text-sm text-tamagotchi-dark">🍩 0</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-xs text-gray-500 font-semibold">DPS</div>
+                    <div id="current-dps-display" class="font-extrabold text-sm text-tamagotchi-dark">0</div>
+                </div>
             </div>
+
+        </div>
     </main>
 
     <div id="info-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
@@ -1348,10 +1355,10 @@
                     initAudio();
                 }
                 
-                // --- FIX: Add small offset (0.001) to Tone.now() to prevent "start time must be strictly greater" error ---
+                // --- FIX: Add small offset to Tone.now() to ensure strictly increasing start times ---
                 const now = Tone.now(); 
                 const offset = 0.001;
-
+                
                 if (sound === 'crunch') {
                     cuteClickSound.triggerAttackRelease('C6', '32n', now + offset);
                 }
@@ -1361,6 +1368,7 @@
                     purchaseSound.triggerAttackRelease('G5', '16n', now + 0.1 + offset);
                 }
             }
+            // ... (rest of audio functions remain the same)
             
             function toggleSfx() {
                 state.ui.isSfxMuted = !state.ui.isSfxMuted;
@@ -1835,15 +1843,6 @@
             if (dom.glazery.blazeActionButton) {
                 dom.glazery.blazeActionButton.onclick = handleBlazeClick;
             }
-            
-            // NEW: Add click handlers for the single oval toggle
-            if (dom.modeSwitchToggleGlaze) {
-                dom.modeSwitchToggleGlaze.onclick = toggleContainer_OvalSwitch;
-            }
-            if (dom.modeSwitchToggleBlaze) {
-                 dom.modeSwitchToggleBlaze.onclick = toggleContainer_OvalSwitch;
-            }
-
 
             dom.musicToggleButton.onclick = toggleMusic;
             dom.sfxToggleButton.onclick = toggleSfx;
