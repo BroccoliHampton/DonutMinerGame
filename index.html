@@ -1012,34 +1012,29 @@
                     console.log('[Blaze] Approval transaction sent:', txHash);
                     console.log('Approval submitted! Waiting for confirmation...');
                     
-                    // Wait for transaction to be mined (poll every 2 seconds for up to 30 seconds)
+                    // Wait for transaction to be confirmed (poll every 2 seconds, up to 30 seconds)
                     let confirmed = false;
-                    const maxAttempts = 15;
+                    let attempts = 0;
+                    const maxAttempts = 15; // 30 seconds total
                     
-                    for (let i = 0; i < maxAttempts && !confirmed; i++) {
-                        await new Promise(resolve => setTimeout(resolve, 2000));
-                        console.log(`[Blaze] Checking approval status (attempt ${i + 1}/${maxAttempts})...`);
+                    while (!confirmed && attempts < maxAttempts) {
+                        attempts++;
+                        console.log(`[Blaze] Checking approval status (attempt ${attempts}/${maxAttempts})...`);
                         
-                        // Fetch fresh state to check approval
-                        const response = await fetch(`${API_BASE_URL}/api/get-game-state?userAddress=${address}`);
-                        if (response.ok) {
-                            const data = await response.json();
-                            if (data.blaze && data.blaze.userNeedsApproval === false) {
-                                confirmed = true;
-                                console.log('[Blaze] ✅ Approval confirmed on-chain!');
-                            }
+                        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+                        
+                        // Fetch updated game state to check if approval went through
+                        await fetchGameState(address);
+                        
+                        // Check if approval is no longer needed
+                        if (!blockchainData.blaze.userNeedsApproval) {
+                            confirmed = true;
+                            console.log('[Blaze] ✅ Approval confirmed! Automatically proceeding to buy transaction...');
+                            updateBlazeryUI();
                         }
                     }
                     
                     if (confirmed) {
-                        // Update approval status only after confirmation
-                        blockchainData.blaze.userNeedsApproval = false;
-                        updateBlazeryUI();
-                        console.log('[Blaze] ✅ Approval confirmed! Automatically proceeding to buy transaction...');
-                        
-                        // Refresh state first to get latest data
-                        await fetchGameState(blockchainData.userAddress);
-                        
                         // Check if user has enough LP tokens
                         const lpBalance = parseFloat(blockchainData.blaze.userLpBalanceFormatted || blockchainData.blaze.userLpBalance);
                         const lpNeeded = parseFloat(blockchainData.blaze.priceFormatted || blockchainData.blaze.price);
@@ -1053,9 +1048,8 @@
                         // Automatically send buy transaction
                         console.log('[Blaze] Sending buy transaction automatically...');
                         await sendBuyTransaction(address);
-                        
                     } else {
-                        console.log('[Blaze] ⚠️ Approval transaction sent but not yet confirmed. Please wait and try again.');
+                        console.log('[Blaze] ⚠️ Approval taking longer than expected. Try clicking Blaze again in a moment.');
                     }
                     
                 } catch (error) {
