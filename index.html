@@ -387,7 +387,7 @@
 </head>
 <body class="text-tamagotchi-dark">
         
-    <main class="flex-grow flex flex-col px-3 pt-4 pb-1 overflow-y-auto max-w-lg mx-auto w-full">
+    <main class="flex-grow flex flex-col px-3 pt-4 pb-1 max-w-lg mx-auto w-full"> <!-- REMOVED overflow-y-auto -->
         <div class="flex justify-between items-center mb-2">
             <div class="flex flex-col">
                 <h1 class="text-3xl font-black text-tamagotchi-pink-dark" style="font-family: 'Luckiest Guy', cursive;">Pinky Glazers</h1>
@@ -432,7 +432,8 @@
                 </div>
             </div>
 
-            <div id="cookie-rain-container" class="relative h-64 flex items-center justify-center overflow-hidden bg-tamagotchi-card rounded-tamagotchi-lg shadow-tamagotchi glitch-static">
+            <!-- ADJUSTED HEIGHT: h-64 changed to h-56 to save vertical space -->
+            <div id="cookie-rain-container" class="relative h-56 flex items-center justify-center overflow-hidden bg-tamagotchi-card rounded-tamagotchi-lg shadow-tamagotchi glitch-static">
                 <div class="falling-snow"></div>
                 <canvas id="cookie-canvas"></canvas>
                 <button id="glaze-color-button" class="color-cycle-button shadow-tamagotchi bg-white text-tamagotchi-dark">🎨</button>
