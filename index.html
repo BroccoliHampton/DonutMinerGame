@@ -1198,7 +1198,7 @@
 
 
             // =============================================================
-            // AUDIO SETUP (Tone.js) - FIXED TIMING ISSUE
+            // AUDIO SETUP (Tone.js) - FIXED BASS SYNC ISSUE
             // =============================================================
             let kick, hiHat, bass, melody;
             let kickSequence, hiHatSequence, bassSequence, melodySequence;
@@ -1246,7 +1246,8 @@
                     envelope: { attack: 0.01, decay: 0.2, sustain: 0.3, release: 0.5 }
                 }).connect(limiter);
 
-                const bassPattern = ['C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', 'D2'];
+                // FIXED BASS PATTERN: Ensures the pattern length is 128 (8n steps) and ends cleanly for looping.
+                const bassPattern = ['C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null];
 
                 bassSequence = new Tone.Sequence((time, note) => {
                     if (note) bass.triggerAttackRelease(note, '8n', time);
