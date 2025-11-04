@@ -278,7 +278,7 @@
         
         body.dark {
             background-color: #5C3317;
-            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%236B4A34' fill-opacity='0.4'%3E%3Cpath d='M10 0L0 10l10 10 10-10z'/%3E%3Cpath d='M0 10L10 20l10-10L10 0z'/%3E%3C/g%3E%3C/svg%3E"), 
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%236B4A34' fill-opacity='0.4'%3E%3Cpath d='M10 0L0 10l10 10 10-10z'/%E3%80%89%3Cpath d='M0 10L10 20l10-10L10 0z'/%3E%3C/g%3E%3C/svg%3E"), 
                             linear-gradient(135deg, #5C3317 0%, #3D2B1F 100%);
         }
 
@@ -447,6 +447,7 @@
                 </div>
             </div>
             
+            <!-- Original Glaze Price Container -->
             <div class="bg-tamagotchi-card text-tamagotchi-dark p-2 rounded-tamagotchi-lg shadow-tamagotchi">
                 <div class="flex justify-between items-center">
                     <div>
@@ -459,6 +460,24 @@
                     </button>
                 </div>
             </div>
+
+            <!-- START Duplicated Blaze Price Container -->
+            <div class="bg-tamagotchi-card text-tamagotchi-dark p-2 rounded-tamagotchi-lg shadow-tamagotchi mt-2">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <div class="text-xs font-semibold text-gray-600">Blaze Price</div>
+                        <!-- Placeholder IDs: We duplicate the IDs to hold the spot, but they won't be wired up in the JS yet. -->
+                        <div id="blaze-price-display" class="text-xl font-extrabold text-tamagotchi-dark">$0.00</div>
+                        <div id="blaze-available-balance-display" class="text-xs text-gray-500">$0.00 available</div>
+                    </div>
+                    <!-- Placeholder ID: This button needs a new ID for the new action -->
+                    <button id="blaze-action-button" class="bg-tamagotchi-button-teal text-white py-2 px-6 rounded-tamagotchi-md text-sm font-bold active:opacity-80 disabled:opacity-50 shadow-tamagotchi">
+                        Blaze
+                    </button>
+                </div>
+            </div>
+            <!-- END Duplicated Blaze Price Container -->
+
 
             <div class="bg-tamagotchi-card rounded-tamagotchi-lg shadow-tamagotchi p-2 grid grid-cols-3 gap-2 mt-2">
                 <div class="text-center">
@@ -612,7 +631,7 @@
             };
 
             // =============================================================
-            // DOM ELEMENTS (remains the same)
+            // DOM ELEMENTS (Updated to include new Blaze elements)
             // =============================================================
             const dom = {
                 glazery: {
@@ -631,6 +650,11 @@
                     availableBalance: document.getElementById('available-balance-display'),
                     totalSupply: document.getElementById('total-supply-display'),
                     currentDps: document.getElementById('current-dps-display'),
+                    
+                    // NEW: Blaze elements (Placeholders for now)
+                    blazePrice: document.getElementById('blaze-price-display'),
+                    blazeAvailableBalance: document.getElementById('blaze-available-balance-display'),
+                    blazeActionButton: document.getElementById('blaze-action-button'),
                 },
                 profileName: document.getElementById('player-profile-name'),
                 musicToggleButton: document.getElementById('music-toggle-button'),
@@ -814,6 +838,14 @@
                 openGlazeFrame();
             }
 
+            // New placeholder function for the new Blaze button
+            function handleBlazeClick() {
+                console.log('[Blaze] Blaze button clicked (Placeholder)');
+                playSoundEffect('purchase'); 
+                // Placeholder: eventually this will call a different transaction function
+                // For now, we do nothing.
+            }
+
             function updateUI() {
                 console.log('[Blockchain] Updating UI');
                 
@@ -848,6 +880,14 @@
                 
                 // Available Balance display (FIXED PRECISION & UNIT - FIX 4)
                 dom.glazery.availableBalance.textContent = `${parseFloat(blockchainData.userEthBalanceFormatted || 0).toFixed(4)} ETH available`;
+
+                // NEW: Update Blaze Price with the same placeholder data for now
+                if (dom.glazery.blazePrice) {
+                    dom.glazery.blazePrice.textContent = `$${(parseFloat(blockchainData.priceInEth || 0) * 100).toFixed(2)} BLAZE`; // Slightly different data for visibility
+                }
+                if (dom.glazery.blazeAvailableBalance) {
+                     dom.glazery.blazeAvailableBalance.textContent = `${parseFloat(blockchainData.userEthBalanceFormatted || 0).toFixed(4)} ETH available`;
+                }
 
                 dom.glazery.donutBalance.textContent = `🍩 ${formatNumber(blockchainData.userDonutBalanceFormatted || 0)}`;
                 dom.glazery.totalSupply.textContent = `🍩 ${formatNumber(blockchainData.totalDonutSupplyFormatted || 0)}`;
@@ -894,7 +934,7 @@
                     envelope: { attack: 0.001, decay: 0.3, sustain: 0.01, release: 0.2 }
                 }).connect(limiter);
                 
-                const kickPattern = ['C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null];
+                const kickPattern = ['C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'GC5', null];
                 
                 kickSequence = new Tone.Sequence((time, note) => {
                     if (note) kick.triggerAttackRelease(note, '8n', time);
@@ -906,7 +946,7 @@
                     envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.05 }
                 }).connect(limiter);
 
-                const hiHatPattern = [null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'GC5', null];
+                const hiHatPattern = [null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'GC5', null];
 
                 hiHatSequence = new Tone.Sequence((time, note) => {
                     if (note) hiHat.triggerAttackRelease('8n', time);
@@ -919,7 +959,7 @@
                     envelope: { attack: 0.01, decay: 0.2, sustain: 0.3, release: 0.5 }
                 }).connect(limiter);
 
-                const bassPattern = ['C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', 'D2'];
+                const bassPattern = ['C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', 'D2'];
 
                 bassSequence = new Tone.Sequence((time, note) => {
                     if (note) bass.triggerAttackRelease(note, '8n', time);
@@ -1444,6 +1484,12 @@
             // =============================================================
             
             dom.glazery.actionButton.onclick = handleGlazeClick;
+            
+            // NEW: Add click handler for the new Blaze button
+            if (dom.glazery.blazeActionButton) {
+                dom.glazery.blazeActionButton.onclick = handleBlazeClick;
+            }
+
             dom.musicToggleButton.onclick = toggleMusic;
             dom.sfxToggleButton.onclick = toggleSfx;
             dom.darkModeToggleButton.onclick = () => {
