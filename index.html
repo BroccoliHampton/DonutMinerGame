@@ -782,9 +782,10 @@
                             paymentToken: data.blaze.paymentToken,
                             paymentTokenPrice: data.blaze.paymentTokenPrice,
                             paymentTokenPriceFormatted: data.blaze.paymentTokenPriceFormatted,
-                            userNeedsApproval: true // Will be updated by checkLpApproval
+                            userNeedsApproval: data.blaze.userNeedsApproval !== undefined ? data.blaze.userNeedsApproval : true
                         };
                         console.log('[Blockchain] Blaze data loaded:', blockchainData.blaze);
+                        console.log('[Blockchain] *** userNeedsApproval:', blockchainData.blaze.userNeedsApproval);
                     }
                     
                     updateUI();
