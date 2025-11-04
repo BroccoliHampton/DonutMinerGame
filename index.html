@@ -388,8 +388,8 @@
         
         .price-line {
             display: flex;
-            align-items: center; /* Vertically centers the toggle with the label */
-            justify-content: flex-start; /* Aligns content to the left */
+            align-items: center; 
+            justify-content: flex-start; 
         }
         
         .toggle-switch-button {
@@ -403,7 +403,7 @@
             padding: 2px;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
             flex-shrink: 0;
-            margin-left: 8px; /* Space between "Glaze Price" label and toggle */
+            margin-left: 8px; 
             
             /* Initial state: Glaze/Pink */
             background-color: #E75480;
@@ -424,21 +424,35 @@
         .toggle-switch-button.blaze-active {
             background-color: #66CCBF;
             border-color: #50A89C;
-            justify-content: flex-end; /* Move knob to the right */
+            justify-content: flex-end; 
         }
         
-        /* FIX: Ensure Glaze/Blaze container overlap correctly without extra margin */
+        /* FIX: Ensure Glaze/Blaze container uses normal flow and margin-top for separation */
+        #action-containers {
+            position: relative;
+            margin-top: 8px; 
+        }
+        
+        #glaze-container {
+             /* Revert to default flow */
+             position: relative;
+             z-index: 10;
+        }
+        
+        #blaze-container {
+             /* Revert to default flow, but hidden initially. No margin-top needed if separated */
+             position: relative;
+             z-index: 10;
+             margin-top: 8px;
+        }
+        
+        /* The container logic is simpler with two separate containers hidden/shown */
         #glaze-container, #blaze-container {
+            /* Ensure correct padding and size */
+            width: 100%;
             padding: 12px;
         }
-        
-        /* FIX: Ensure the action button and claim amount are correctly stacked */
-        .action-group {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-        
+
         /* FIX: Container alignment for both GLOW and BLAZE */
         .main-content {
             display: flex;
@@ -453,22 +467,11 @@
             line-height: 1.1; 
         }
 
-        /* FIX: Ensure the Glaze/Blaze main cards correctly overlay */
-        #action-containers {
-            position: relative;
-            /* Added margin-top to separate from ticker, and removed mt-2 from inner containers */
-            margin-top: 8px; 
-        }
-        
-        #glaze-container, #blaze-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            /* Ensures both containers take the same space and align */
-            width: 100%;
-            /* Fix: Height is determined by content */
-            height: auto;
+        /* FIX: Ensure the action button and claim amount are correctly stacked */
+        .action-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
         }
     </style>
 </head>
@@ -536,7 +539,7 @@
             
             <div id="action-containers" class="relative mt-2">
 
-                <div id="glaze-container" class="bg-tamagotchi-card text-tamagotchi-dark p-2 rounded-tamagotchi-lg shadow-tamagotchi relative z-10">
+                <div id="glaze-container" class="bg-tamagotchi-card text-tamagotchi-dark rounded-tamagotchi-lg shadow-tamagotchi">
                     <div class="main-content">
                         
                         <div class="price-details">
@@ -559,7 +562,7 @@
                     </div>
                 </div>
 
-                <div id="blaze-container" class="bg-tamagotchi-card text-tamagotchi-dark p-2 rounded-tamagotchi-lg shadow-tamagotchi absolute inset-0 hidden">
+                <div id="blaze-container" class="bg-tamagotchi-card text-tamagotchi-dark rounded-tamagotchi-lg shadow-tamagotchi hidden mt-2">
                     <div class="main-content">
                         
                         <div class="price-details">
@@ -833,15 +836,15 @@
                     // Switch to Blaze
                     dom.glazeContainer.classList.add('hidden');
                     dom.blazeContainer.classList.remove('hidden');
-                    // Update classes for visual state
+                    // Ensure the correct state class is applied to the visible toggle
+                    dom.modeSwitchToggleBlaze.classList.add('blaze-active'); 
                     dom.modeSwitchToggleGlaze.classList.add('blaze-active'); 
-                    dom.modeSwitchToggleBlaze.classList.add('blaze-active');
                     state.ui.activeContainer = 'blaze';
                 } else {
                     // Switch to Glaze
                     dom.blazeContainer.classList.add('hidden');
                     dom.glazeContainer.classList.remove('hidden');
-                    // Update classes for visual state
+                     // Ensure the correct state class is removed from the visible toggle
                     dom.modeSwitchToggleGlaze.classList.remove('blaze-active'); 
                     dom.modeSwitchToggleBlaze.classList.remove('blaze-active');
                     state.ui.activeContainer = 'glaze';
@@ -1854,6 +1857,15 @@
             if (dom.glazery.blazeActionButton) {
                 dom.glazery.blazeActionButton.onclick = handleBlazeClick;
             }
+            
+            // NEW: Add click handlers for the single oval toggle
+            if (dom.modeSwitchToggleGlaze) {
+                dom.modeSwitchToggleGlaze.onclick = toggleContainer_OvalSwitch;
+            }
+            if (dom.modeSwitchToggleBlaze) {
+                 dom.modeSwitchToggleBlaze.onclick = toggleContainer_OvalSwitch;
+            }
+
 
             dom.musicToggleButton.onclick = toggleMusic;
             dom.sfxToggleButton.onclick = toggleSfx;
