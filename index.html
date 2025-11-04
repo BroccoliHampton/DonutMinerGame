@@ -888,22 +888,26 @@
                 openGlazeFrame();
             }
 
-            // NEW: Complete Blaze click handler
+            // NEW: Handle Blaze/Buy click - works like Glaze (direct transaction)
             async function handleBlazeClick() {
                 console.log('[Blaze] Blaze button clicked');
                 playSoundEffect('purchase');
+                donutSpinSpeed = 0.5; // Spin the donut
                 
                 try {
-                    // Check if user is connected
-                    if (!blockchainData.userAddress) {
+                    if (!FarcasterSDK) throw new Error("SDK not initialized.");
+                    
+                    const address = blockchainData.userAddress;
+                    
+                    if (!address) {
                         console.log('[Blaze] No wallet connected');
                         return;
                     }
                     
                     // Check if user needs approval first
                     if (blockchainData.blaze.userNeedsApproval) {
-                        console.log('[Blaze] User needs approval, opening approval frame');
-                        openBlazeFrame(true); // true = needs approval
+                        console.log('[Blaze] Needs approval - calling approve transaction');
+                        await sendApprovalTransaction(address);
                         return;
                     }
                     
@@ -917,32 +921,118 @@
                         return;
                     }
                     
-                    console.log('[Blaze] Opening blaze transaction frame');
-                    openBlazeFrame(false); // false = has approval, ready to blaze
+                    // All checks passed - send buy transaction
+                    console.log('[Blaze] Sending buy transaction...');
+                    await sendBuyTransaction(address);
                     
                 } catch (error) {
                     console.error('[Blaze] Error:', error);
                 }
             }
             
-            // NEW: Open Blaze frame
-            function openBlazeFrame(needsApproval) {
+            // NEW: Send LP token approval transaction
+            async function sendApprovalTransaction(address) {
                 try {
-                    const frameUrl = `${API_BASE_URL}/api/blaze-payment-frame?needsApproval=${needsApproval}`;
+                    console.log('[Blaze] Fetching approval transaction data...');
                     
-                    console.log('[Blaze] Opening frame:', frameUrl);
+                    // Fetch approval transaction data from API
+                    const approvalResponse = await fetch(`${API_BASE_URL}/api/approve-lp?player=${address}`, {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' },
+                        mode: 'cors'
+                    });
                     
-                    // Use Farcaster SDK to open frame
-                    if (FarcasterSDK && typeof FarcasterSDK.actions.openUrl === 'function') {
-                        FarcasterSDK.actions.openUrl(frameUrl);
-                    } else {
-                        console.error('[Blaze] Farcaster SDK not available');
-                        // Fallback: open in new window for testing
-                        window.open(frameUrl, '_blank');
+                    if (!approvalResponse.ok) {
+                        throw new Error(`Failed to get approval data: ${approvalResponse.status}`);
                     }
                     
+                    const txData = await approvalResponse.json();
+                    console.log('[Blaze] Approval transaction data received:', txData);
+                    
+                    const provider = await FarcasterSDK.wallet.getEthereumProvider();
+                    
+                    if (!provider) {
+                        throw new Error('Wallet provider not available');
+                    }
+                    
+                    console.log('[Blaze] Sending approval transaction...');
+                    
+                    const txParams = [{
+                        from: address,
+                        to: txData.params.to,
+                        data: txData.params.data,
+                        value: txData.params.value || '0x0',
+                    }];
+                    
+                    const txHash = await sendTxWithRetry(provider, txParams);
+                    
+                    console.log('[Blaze] Approval transaction sent:', txHash);
+                    console.log('Approval submitted! Now you can Blaze.');
+                    
+                    // Update approval status
+                    blockchainData.blaze.userNeedsApproval = false;
+                    updateBlazeryUI();
+                    
+                    // Refresh state after approval
+                    setTimeout(() => {
+                        console.log('[Blaze] Refreshing after approval...');
+                        fetchGameState(blockchainData.userAddress);
+                    }, 3000);
+                    
                 } catch (error) {
-                    console.error('[Blaze] Error opening frame:', error);
+                    console.error('[Blaze] Approval error:', error);
+                    console.log(`Approval failed: ${error.message}`);
+                }
+            }
+            
+            // NEW: Send buy transaction (uses LP tokens to get ETH)
+            async function sendBuyTransaction(address) {
+                try {
+                    console.log('[Blaze] Fetching buy transaction data...');
+                    
+                    // Fetch buy transaction data from API
+                    const buyResponse = await fetch(`${API_BASE_URL}/api/blaze-transaction?player=${address}`, {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' },
+                        mode: 'cors'
+                    });
+                    
+                    if (!buyResponse.ok) {
+                        throw new Error(`Failed to get buy transaction data: ${buyResponse.status}`);
+                    }
+                    
+                    const txData = await buyResponse.json();
+                    console.log('[Blaze] Buy transaction data received:', txData);
+                    
+                    const provider = await FarcasterSDK.wallet.getEthereumProvider();
+                    
+                    if (!provider) {
+                        throw new Error('Wallet provider not available');
+                    }
+                    
+                    console.log('[Blaze] Sending buy transaction...');
+                    
+                    const txParams = [{
+                        from: address,
+                        to: txData.params.to,
+                        data: txData.params.data,
+                        value: txData.params.value || '0x0',
+                    }];
+                    
+                    const txHash = await sendTxWithRetry(provider, txParams);
+                    
+                    console.log('[Blaze] Buy transaction sent:', txHash);
+                    console.log('Buy transaction submitted! You received ETH.');
+                    
+                    // Refresh state after transaction
+                    setTimeout(() => {
+                        console.log('[Blaze] Refreshing after buy...');
+                        fetchGameState(blockchainData.userAddress);
+                    }, 3000);
+                    
+                } catch (error) {
+                    console.error('[Blaze] Buy transaction error:', error);
+                    console.log(`Buy transaction failed: ${error.message}`);
                 }
             }
             
