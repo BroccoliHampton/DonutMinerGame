@@ -782,10 +782,9 @@
                             paymentToken: data.blaze.paymentToken,
                             paymentTokenPrice: data.blaze.paymentTokenPrice,
                             paymentTokenPriceFormatted: data.blaze.paymentTokenPriceFormatted,
-                            userNeedsApproval: data.blaze.userNeedsApproval !== undefined ? data.blaze.userNeedsApproval : true
+                            userNeedsApproval: true // Will be updated by checkLpApproval
                         };
                         console.log('[Blockchain] Blaze data loaded:', blockchainData.blaze);
-                        console.log('[Blockchain] *** userNeedsApproval:', blockchainData.blaze.userNeedsApproval);
                     }
                     
                     updateUI();
@@ -956,33 +955,17 @@
                     const txHash = await sendTxWithRetry(provider, txParams);
                     
                     console.log('[Blaze] Approval transaction sent:', txHash);
-                    console.log('Approval submitted! Waiting for confirmation...');
+                    console.log('Approval submitted! Now you can Blaze.');
                     
-                    // Wait for transaction to be confirmed (poll every 2 seconds, up to 30 seconds)
-                    let confirmed = false;
-                    let attempts = 0;
-                    const maxAttempts = 15; // 30 seconds total
+                    // Update approval status
+                    blockchainData.blaze.userNeedsApproval = false;
+                    updateBlazeryUI();
                     
-                    while (!confirmed && attempts < maxAttempts) {
-                        attempts++;
-                        console.log(`[Blaze] Checking approval status (attempt ${attempts}/${maxAttempts})...`);
-                        
-                        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
-                        
-                        // Fetch updated game state to check if approval went through
-                        await fetchGameState(address);
-                        
-                        // Check if approval is no longer needed
-                        if (!blockchainData.blaze.userNeedsApproval) {
-                            confirmed = true;
-                            console.log('[Blaze] Approval confirmed! You can now Blaze.');
-                            updateBlazeryUI();
-                        }
-                    }
-                    
-                    if (!confirmed) {
-                        console.log('[Blaze] Approval taking longer than expected. Try clicking Blaze again in a moment.');
-                    }
+                    // Refresh state after approval
+                    setTimeout(() => {
+                        console.log('[Blaze] Refreshing after approval...');
+                        fetchGameState(blockchainData.userAddress);
+                    }, 3000);
                     
                 } catch (error) {
                     console.error('[Blaze] Approval error:', error);
@@ -1056,10 +1039,9 @@
                     dom.glazery.blazePrice.textContent = lpAmount.toFixed(4);
                 }
                 
-                // Update claimable ETH (what user gets)
+                // Update claimable ETH (what user gets from auction)
                 if (dom.glazery.blazeClaimAmount) {
-                    const ethAmount = parseFloat(blockchainData.blaze.wethBalanceFormatted);
-                    // The claim amount is now smaller (text-sm) as per the request's design goal
+                    const ethAmount = parseFloat(blockchainData.blaze.wethAccumulatedFormatted);
                     dom.glazery.blazeClaimAmount.textContent = `${ethAmount.toFixed(6)} ETH`; 
                 }
                 
