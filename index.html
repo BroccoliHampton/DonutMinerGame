@@ -553,6 +553,10 @@
         // =================================================================
         const API_BASE_URL = 'https://last-game-kappa.vercel.app';
         const REFRESH_INTERVAL = 10000; // 10 seconds
+        
+        // CONTRACT ADDRESSES - UPDATED FOR NEW MULTICALL
+        const MULTICALL_ADDRESS = '0x3eE553912ba4262Ddd955DD5F910bA0844B16278';
+        const LP_TOKEN_ADDRESS = '0xc3b9bd6f7d4bfcc22696a7bc1cc83948a33d7fab';
 
         // =================================================================
         // BLOCKCHAIN STATE  
@@ -574,7 +578,19 @@
             timeAsMiner: 0,
             secondsUntilHalving: 0,
             userAddress: null,
-            fid: null
+            fid: null,
+            // NEW: Blaze state
+            blaze: {
+                epochId: 0,
+                price: '0',
+                priceFormatted: '0',
+                wethBalance: '0',
+                wethBalanceFormatted: '0',
+                userLpBalance: '0',
+                userLpBalanceFormatted: '0',
+                paymentToken: null,
+                userNeedsApproval: true
+            }
         };
 
         // =================================================================
@@ -761,8 +777,30 @@
                     const data = await response.json();
                     console.log('[Blockchain] Data received:', data);
                     
+                    // Update glazery state
                     blockchainData = { ...blockchainData, ...data };
+                    
+                    // NEW: Update blaze state if available
+                    if (data.blaze) {
+                        blockchainData.blaze = {
+                            epochId: data.blaze.epochId,
+                            price: data.blaze.price,
+                            priceFormatted: data.blaze.priceFormatted,
+                            wethBalance: data.blaze.wethBalance,
+                            wethBalanceFormatted: data.blaze.wethBalanceFormatted,
+                            userLpBalance: data.blaze.userLpBalance,
+                            userLpBalanceFormatted: data.blaze.userLpBalanceFormatted,
+                            paymentToken: data.blaze.paymentToken,
+                            paymentTokenPrice: data.blaze.paymentTokenPrice,
+                            paymentTokenPriceFormatted: data.blaze.paymentTokenPriceFormatted,
+                            userNeedsApproval: true // Will be updated by checkLpApproval
+                        };
+                        console.log('[Blockchain] Blaze data loaded:', blockchainData.blaze);
+                    }
+                    
                     updateUI();
+                    updateBlazeryUI(); // NEW: Update Blaze UI
+                    
                     return data;
                 } catch (error) {
                     console.error('[Blockchain] Fetch error:', error);
@@ -850,12 +888,113 @@
                 openGlazeFrame();
             }
 
-            // New placeholder function for the new Blaze button
-            function handleBlazeClick() {
-                console.log('[Blaze] Blaze button clicked (Placeholder)');
-                playSoundEffect('purchase'); 
-                // Placeholder: eventually this will call a different transaction function
-                // For now, we do nothing.
+            // NEW: Complete Blaze click handler
+            async function handleBlazeClick() {
+                console.log('[Blaze] Blaze button clicked');
+                playSoundEffect('purchase');
+                
+                try {
+                    // Check if user is connected
+                    if (!blockchainData.userAddress) {
+                        console.log('[Blaze] No wallet connected');
+                        return;
+                    }
+                    
+                    // Check if user needs approval first
+                    if (blockchainData.blaze.userNeedsApproval) {
+                        console.log('[Blaze] User needs approval, opening approval frame');
+                        openBlazeFrame(true); // true = needs approval
+                        return;
+                    }
+                    
+                    // Check if user has enough LP tokens
+                    const lpBalance = parseFloat(blockchainData.blaze.userLpBalance);
+                    const lpNeeded = parseFloat(blockchainData.blaze.price);
+                    
+                    if (lpBalance < lpNeeded) {
+                        console.log('[Blaze] Insufficient LP balance');
+                        console.log(`Need ${lpNeeded.toFixed(4)} LP but only have ${lpBalance.toFixed(4)} LP`);
+                        return;
+                    }
+                    
+                    console.log('[Blaze] Opening blaze transaction frame');
+                    openBlazeFrame(false); // false = has approval, ready to blaze
+                    
+                } catch (error) {
+                    console.error('[Blaze] Error:', error);
+                }
+            }
+            
+            // NEW: Open Blaze frame
+            function openBlazeFrame(needsApproval) {
+                try {
+                    const frameUrl = `${API_BASE_URL}/api/blaze-payment-frame?needsApproval=${needsApproval}`;
+                    
+                    console.log('[Blaze] Opening frame:', frameUrl);
+                    
+                    // Use Farcaster SDK to open frame
+                    if (FarcasterSDK && typeof FarcasterSDK.actions.openUrl === 'function') {
+                        FarcasterSDK.actions.openUrl(frameUrl);
+                    } else {
+                        console.error('[Blaze] Farcaster SDK not available');
+                        // Fallback: open in new window for testing
+                        window.open(frameUrl, '_blank');
+                    }
+                    
+                } catch (error) {
+                    console.error('[Blaze] Error opening frame:', error);
+                }
+            }
+            
+            // NEW: Update Blaze UI elements
+            function updateBlazeryUI() {
+                if (!blockchainData.blaze) {
+                    console.log('[Blaze] No blaze data available');
+                    return;
+                }
+                
+                console.log('[Blaze] Updating UI');
+                
+                // Update LP price (what user pays)
+                if (dom.glazery.blazePrice) {
+                    const lpAmount = parseFloat(blockchainData.blaze.priceFormatted);
+                    dom.glazery.blazePrice.textContent = lpAmount.toFixed(4);
+                }
+                
+                // Update claimable ETH (what user gets)
+                if (dom.glazery.blazeClaimAmount) {
+                    const ethAmount = parseFloat(blockchainData.blaze.wethBalanceFormatted);
+                    dom.glazery.blazeClaimAmount.textContent = `${ethAmount.toFixed(8)} ETH`;
+                }
+                
+                // Update user's LP balance
+                if (dom.glazery.blazeAvailableBalance) {
+                    const userLpBalance = parseFloat(blockchainData.blaze.userLpBalanceFormatted);
+                    dom.glazery.blazeAvailableBalance.textContent = `${userLpBalance.toFixed(4)} LP available`;
+                }
+                
+                // Update button state
+                const blazeButton = dom.glazery.blazeActionButton;
+                if (blazeButton) {
+                    const hasEnoughLp = parseFloat(blockchainData.blaze.userLpBalance) >= parseFloat(blockchainData.blaze.price);
+                    const needsApproval = blockchainData.blaze.userNeedsApproval;
+                    
+                    if (!blockchainData.userAddress) {
+                        blazeButton.textContent = 'Connect Wallet';
+                        blazeButton.disabled = false;
+                    } else if (needsApproval) {
+                        blazeButton.textContent = 'Approve LP';
+                        blazeButton.disabled = false;
+                    } else if (!hasEnoughLp) {
+                        blazeButton.textContent = 'Insufficient LP';
+                        blazeButton.disabled = true;
+                    } else {
+                        blazeButton.textContent = 'Blaze 🔥';
+                        blazeButton.disabled = false;
+                    }
+                }
+                
+                console.log('[Blaze] UI updated successfully');
             }
 
             function updateUI() {
@@ -892,12 +1031,6 @@
                 
                 // Available Balance display (FIXED PRECISION & UNIT - FIX 4)
                 dom.glazery.availableBalance.textContent = `${parseFloat(blockchainData.userEthBalanceFormatted || 0).toFixed(4)} ETH available`;
-
-                // NEW: Update Blaze Price (LP label and no dollar sign)
-                if (dom.glazery.blazePrice) {
-                    // Placeholder value: same as glaze price ETH, no currency sign
-                    dom.glazery.blazePrice.textContent = `${parseFloat(blockchainData.priceInEth || 0).toFixed(6)}`; 
-                }
                 // NEW: Update Blaze Available Balance (LP label)
                 if (dom.glazery.blazeAvailableBalance) {
                      dom.glazery.blazeAvailableBalance.textContent = `${parseFloat(blockchainData.userEthBalanceFormatted || 0).toFixed(4)} LP available`;
