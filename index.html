@@ -775,6 +775,8 @@
                             epochId: data.blaze.epochId,
                             price: data.blaze.price,
                             priceFormatted: data.blaze.priceFormatted,
+                            wethAccumulated: data.blaze.wethAccumulated,
+                            wethAccumulatedFormatted: data.blaze.wethAccumulatedFormatted,
                             wethBalance: data.blaze.wethBalance,
                             wethBalanceFormatted: data.blaze.wethBalanceFormatted,
                             userLpBalance: data.blaze.userLpBalance,
@@ -782,9 +784,11 @@
                             paymentToken: data.blaze.paymentToken,
                             paymentTokenPrice: data.blaze.paymentTokenPrice,
                             paymentTokenPriceFormatted: data.blaze.paymentTokenPriceFormatted,
-                            userNeedsApproval: true // Will be updated by checkLpApproval
+                            userNeedsApproval: data.blaze.userNeedsApproval !== undefined ? data.blaze.userNeedsApproval : true
                         };
                         console.log('[Blockchain] Blaze data loaded:', blockchainData.blaze);
+                        console.log('[Blockchain] *** userNeedsApproval:', blockchainData.blaze.userNeedsApproval);
+                        console.log('[Blockchain] *** wethAccumulated (claimable):', blockchainData.blaze.wethAccumulatedFormatted);
                     }
                     
                     updateUI();
