@@ -123,6 +123,37 @@
             right: 88px;
         }
 
+        /* NEW: Toggle button positioning */
+        #view-toggle-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #C04A70;
+            background: linear-gradient(to bottom, #FFDDE1, #E75480);
+            color: white;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.1s ease-in-out, opacity 0.2s;
+            z-index: 30;
+            font-weight: bold;
+        }
+        #view-toggle-button:active {
+            transform: translateY(1px);
+            box-shadow: none;
+        }
+        /* Style for the two containers below the donut */
+        .glaze-blaze-container {
+            min-height: 100px; /* Adjust based on content height to prevent jump */
+            transition: opacity 0.3s ease;
+        }
+
         .glitch-static {
             position: relative;
             overflow: hidden;
@@ -264,11 +295,6 @@
             font-weight: bold;
             font-family: 'Comic Neue', cursive;
             text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
-        }
-
-        @keyframes scroll-ticker {
-            0% { transform: translateX(0%); }
-            100% { transform: translateX(-50%); }
         }
 
         @keyframes scroll-ticker-reverse {
@@ -435,6 +461,7 @@
             <div id="cookie-rain-container" class="relative h-56 flex items-center justify-center overflow-hidden bg-tamagotchi-card rounded-tamagotchi-lg shadow-tamagotchi glitch-static">
                 <div class="falling-snow"></div>
                 <canvas id="cookie-canvas"></canvas>
+                <button id="view-toggle-button" class="shadow-tamagotchi">🧊</button>
                 <button id="glaze-color-button" class="color-cycle-button shadow-tamagotchi bg-white text-tamagotchi-dark">🎨</button>
                 <button id="sprinkle-color-button" class="color-cycle-button shadow-tamagotchi bg-white text-tamagotchi-dark">🌈</button>
                 <button id="donut-base-color-button" class="color-cycle-button shadow-tamagotchi bg-white text-tamagotchi-dark">🍩</button>
@@ -447,38 +474,53 @@
                 </div>
             </div>
             
-            <div class="bg-tamagotchi-card text-tamagotchi-dark p-2 rounded-tamagotchi-lg shadow-tamagotchi">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <div class="text-xs font-semibold text-gray-600">Glaze Price</div>
-                        <div id="glaze-price-display" class="text-xl font-extrabold text-tamagotchi-dark">$0.00</div>
-                        <div id="available-balance-display" class="text-xs text-gray-500">$0.00 available</div>
+            <div id="glaze-blaze-wrapper" class="glaze-blaze-container flex flex-col justify-start"> 
+                
+                <div id="glaze-container">
+                    <div class="bg-tamagotchi-card text-tamagotchi-dark p-2 rounded-tamagotchi-lg shadow-tamagotchi">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="text-xs font-semibold text-gray-600">Glaze Price</div>
+                                <div id="glaze-price-display" class="text-xl font-extrabold text-tamagotchi-dark">$0.00</div>
+                                <div id="available-balance-display" class="text-xs text-gray-500">$0.00 available</div>
+                            </div>
+                            
+                            <div class="flex flex-col items-end">
+                                <button id="bakery-action-button" class="bg-tamagotchi-button-pink text-white py-2 px-6 rounded-tamagotchi-md text-sm font-bold active:opacity-80 disabled:opacity-50 shadow-tamagotchi">
+                                    Glaze
+                                </button>
+                                <div class="text-right mt-1"> 
+                                    <div class="text-xs font-semibold text-gray-600">Donuts/s</div>
+                                    <div id="glaze-dps-display" class="text-sm font-extrabold text-tamagotchi-dark">0.00</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <button id="bakery-action-button" class="bg-tamagotchi-button-pink text-white py-2 px-6 rounded-tamagotchi-md text-sm font-bold active:opacity-80 disabled:opacity-50 shadow-tamagotchi">
-                        Glaze
-                    </button>
                 </div>
-            </div>
 
-            <div class="bg-tamagotchi-card text-tamagotchi-dark p-2 rounded-tamagotchi-lg shadow-tamagotchi mt-2">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <div class="text-xs font-semibold text-gray-600">Blaze Price (LP)</div>
-                        <div id="blaze-price-display" class="text-xl font-extrabold text-tamagotchi-dark">0.00</div>
-                        <div id="blaze-available-balance-display" class="text-xs text-gray-500">0.00 LP available</div>
-                    </div>
-                    
-                    <div class="flex flex-col items-end">
-                        <button id="blaze-action-button" class="bg-tamagotchi-button-teal text-white py-2 px-6 rounded-tamagotchi-md text-sm font-bold active:opacity-80 disabled:opacity-50 shadow-tamagotchi">
-                            Blaze
-                        </button>
-                        <div class="text-center mt-1">
-                            <div class="text-xs font-semibold text-gray-600">Claim</div>
-                            <div id="blaze-claim-amount" class="text-sm font-extrabold text-tamagotchi-dark">0.00 ETH</div>
+                <div id="blaze-container" class="hidden"> 
+                    <div class="bg-tamagotchi-card text-tamagotchi-dark p-2 rounded-tamagotchi-lg shadow-tamagotchi">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="text-xs font-semibold text-gray-600">Blaze Price (LP)</div>
+                                <div id="blaze-price-display" class="text-xl font-extrabold text-tamagotchi-dark">0.00</div>
+                                <div id="blaze-available-balance-display" class="text-xs text-gray-500">0.00 LP available</div>
+                            </div>
+                            
+                            <div class="flex flex-col items-end">
+                                <button id="blaze-action-button" class="bg-tamagotchi-button-teal text-white py-2 px-6 rounded-tamagotchi-md text-sm font-bold active:opacity-80 disabled:opacity-50 shadow-tamagotchi">
+                                    Blaze
+                                </button>
+                                <div class="text-right mt-1">
+                                    <div class="text-xs font-semibold text-gray-600">Claim</div>
+                                    <div id="blaze-claim-amount" class="text-sm font-extrabold text-tamagotchi-dark">0.00 ETH</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
             <div class="bg-tamagotchi-card rounded-tamagotchi-lg shadow-tamagotchi p-2 grid grid-cols-3 gap-2 mt-2">
                 <div class="text-center">
                     <div class="text-xs text-gray-500 font-semibold">Donut Balance</div>
@@ -544,7 +586,7 @@
         const REFRESH_INTERVAL = 10000; // 10 seconds
         
         // CONTRACT ADDRESSES - UPDATED FOR NEW MULTICALL
-        const MULTICALL_ADDRESS = '0xe03a89eb8b75d73Caf762a81dA260106fD42F18A';
+        const MULTICALL_ADDRESS = '0x3eE553912ba4262Ddd955DD5F910bA0844B16278';
         const LP_TOKEN_ADDRESS = '0xc3b9bd6f7d4bfcc22696a7bc1cc83948a33d7fab';
 
         // =================================================================
@@ -642,12 +684,13 @@
             const state = {
                 ui: {
                     isDarkMode: false,
-                    isSfxMuted: false
+                    isSfxMuted: false,
+                    isGlazeView: true, // NEW: Start on Glaze view
                 }
             };
 
             // =============================================================
-            // DOM ELEMENTS (Updated to include new Blaze elements)
+            // DOM ELEMENTS (Updated to include new Blaze and Toggle elements)
             // =============================================================
             const dom = {
                 glazery: {
@@ -667,6 +710,14 @@
                     totalSupply: document.getElementById('total-supply-display'),
                     currentDps: document.getElementById('current-dps-display'),
                     
+                    // NEW: Glaze/Blaze Toggle containers
+                    toggleButton: document.getElementById('view-toggle-button'), // NEW ELEMENT
+                    glazeContainer: document.getElementById('glaze-container'), // NEW ELEMENT
+                    blazeContainer: document.getElementById('blaze-container'), // NEW ELEMENT
+                    
+                    // NEW: Glaze DPS Element for height matching
+                    glazeDpsDisplay: document.getElementById('glaze-dps-display'), // NEW ELEMENT
+
                     // NEW: Blaze elements
                     blazePrice: document.getElementById('blaze-price-display'),
                     blazeAvailableBalance: document.getElementById('blaze-available-balance-display'),
@@ -775,6 +826,8 @@
                             epochId: data.blaze.epochId,
                             price: data.blaze.price,
                             priceFormatted: data.blaze.priceFormatted,
+                            wethAccumulated: data.blaze.wethAccumulated,
+                            wethAccumulatedFormatted: data.blaze.wethAccumulatedFormatted,
                             wethBalance: data.blaze.wethBalance,
                             wethBalanceFormatted: data.blaze.wethBalanceFormatted,
                             userLpBalance: data.blaze.userLpBalance,
@@ -786,6 +839,7 @@
                         };
                         console.log('[Blockchain] Blaze data loaded:', blockchainData.blaze);
                         console.log('[Blockchain] *** userNeedsApproval:', blockchainData.blaze.userNeedsApproval);
+                        console.log('[Blockchain] *** wethAccumulated (claimable):', blockchainData.blaze.wethAccumulatedFormatted);
                     }
                     
                     updateUI();
@@ -956,33 +1010,17 @@
                     const txHash = await sendTxWithRetry(provider, txParams);
                     
                     console.log('[Blaze] Approval transaction sent:', txHash);
-                    console.log('Approval submitted! Waiting for confirmation...');
+                    console.log('Approval submitted! Now you can Blaze.');
                     
-                    // Wait for transaction to be confirmed (poll every 2 seconds, up to 30 seconds)
-                    let confirmed = false;
-                    let attempts = 0;
-                    const maxAttempts = 15; // 30 seconds total
+                    // Update approval status
+                    blockchainData.blaze.userNeedsApproval = false;
+                    updateBlazeryUI();
                     
-                    while (!confirmed && attempts < maxAttempts) {
-                        attempts++;
-                        console.log(`[Blaze] Checking approval status (attempt ${attempts}/${maxAttempts})...`);
-                        
-                        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
-                        
-                        // Fetch updated game state to check if approval went through
-                        await fetchGameState(address);
-                        
-                        // Check if approval is no longer needed
-                        if (!blockchainData.blaze.userNeedsApproval) {
-                            confirmed = true;
-                            console.log('[Blaze] Approval confirmed! You can now Blaze.');
-                            updateBlazeryUI();
-                        }
-                    }
-                    
-                    if (!confirmed) {
-                        console.log('[Blaze] Approval taking longer than expected. Try clicking Blaze again in a moment.');
-                    }
+                    // Refresh state after approval
+                    setTimeout(() => {
+                        console.log('[Blaze] Refreshing after approval...');
+                        fetchGameState(blockchainData.userAddress);
+                    }, 3000);
                     
                 } catch (error) {
                     console.error('[Blaze] Approval error:', error);
@@ -1056,10 +1094,9 @@
                     dom.glazery.blazePrice.textContent = lpAmount.toFixed(4);
                 }
                 
-                // Update claimable ETH (what user gets)
+                // Update claimable ETH (what user gets from auction)
                 if (dom.glazery.blazeClaimAmount) {
-                    const ethAmount = parseFloat(blockchainData.blaze.wethBalanceFormatted);
-                    // The claim amount is now smaller (text-sm) as per the request's design goal
+                    const ethAmount = parseFloat(blockchainData.blaze.wethAccumulatedFormatted);
                     dom.glazery.blazeClaimAmount.textContent = `${ethAmount.toFixed(6)} ETH`; 
                 }
                 
@@ -1116,15 +1153,21 @@
                 dom.glazery.availableBalance.textContent = `${parseFloat(blockchainData.userEthBalanceFormatted || 0).toFixed(4)} ETH available`;
                 // NEW: Update Blaze Available Balance (LP label)
                 if (dom.glazery.blazeAvailableBalance) {
-                     dom.glazery.blazeAvailableBalance.textContent = `${parseFloat(blockchainData.userEthBalanceFormatted || 0).toFixed(4)} LP available`;
+                     dom.glazery.blazeAvailableBalance.textContent = `${parseFloat(blockchainData.blaze.userLpBalanceFormatted || 0).toFixed(4)} LP available`;
                 }
                 
-                // NEW: Update Blaze Claim Amount (Placeholder value)
-                if (dom.glazery.blazeClaimAmount) {
-                    // Placeholder: use user's claimable donuts * 0.001 as a mock ETH value
-                    const mockClaimEth = (parseFloat(blockchainData.claimableDonutsFormatted || 0) * 0.001).toFixed(6);
-                    dom.glazery.blazeClaimAmount.textContent = `${mockClaimEth} ETH`;
+                // NEW: Update Blaze Claim Amount (using actual blaze data)
+                if (dom.glazery.blazeClaimAmount && blockchainData.blaze.wethAccumulatedFormatted) {
+                    const claimEth = parseFloat(blockchainData.blaze.wethAccumulatedFormatted);
+                    dom.glazery.blazeClaimAmount.textContent = `${claimEth.toFixed(6)} ETH`;
                 }
+                
+                // === NEW: Update Glaze DPS Display for height matching ===
+                if (dom.glazery.glazeDpsDisplay) {
+                     // Display the DPS from the blockchain data, formatted to 2 decimal places.
+                     dom.glazery.glazeDpsDisplay.textContent = parseFloat(blockchainData.currentDpsFormatted || 0).toFixed(2);
+                }
+                // =========================================================
 
 
                 dom.glazery.donutBalance.textContent = `🍩 ${formatNumber(blockchainData.userDonutBalanceFormatted || 0)}`;
@@ -1147,9 +1190,27 @@
                 }
             }
 
+            // =============================================================
+            // VIEW TOGGLE LOGIC (NEW FUNCTION)
+            // =============================================================
+            function toggleView() {
+                playSoundEffect('crunch');
+                state.ui.isGlazeView = !state.ui.isGlazeView;
+
+                if (state.ui.isGlazeView) {
+                    dom.glazery.glazeContainer.classList.remove('hidden');
+                    dom.glazery.blazeContainer.classList.add('hidden');
+                    dom.glazery.toggleButton.textContent = '🧊'; // Ice cube for Glaze view
+                } else {
+                    dom.glazery.glazeContainer.classList.add('hidden');
+                    dom.glazery.blazeContainer.classList.remove('hidden');
+                    dom.glazery.toggleButton.textContent = '🔥'; // Flame for Blaze view
+                }
+            }
+
 
             // =============================================================
-            // AUDIO SETUP (Tone.js) - FIXED TIMING ISSUE
+            // AUDIO SETUP (Tone.js) - FIXED BASS SYNC ISSUE
             // =============================================================
             let kick, hiHat, bass, melody;
             let kickSequence, hiHatSequence, bassSequence, melodySequence;
@@ -1197,7 +1258,20 @@
                     envelope: { attack: 0.01, decay: 0.2, sustain: 0.3, release: 0.5 }
                 }).connect(limiter);
 
-                const bassPattern = ['C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', 'D2'];
+                // FIXED BASS PATTERN: 16 bars (128 steps) ensuring the harmonic change is on the downbeat of bar 5 and bar 9.
+                const bassPattern = [
+                    'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, // Bar 1-2 (C minor)
+                    'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, // Bar 3-4 (C minor)
+                    
+                    'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, // Bar 5-6 (G# minor)
+                    'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, // Bar 7-8 (G# minor)
+
+                    'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, // Bar 9-10 (F minor)
+                    'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, // Bar 11-12 (F minor)
+
+                    'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, // Bar 13-14 (G minor)
+                    'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null // Bar 15-16 (G minor - Loop Point)
+                ];
 
                 bassSequence = new Tone.Sequence((time, note) => {
                     if (note) bass.triggerAttackRelease(note, '8n', time);
@@ -1729,6 +1803,11 @@
             // NEW: Add click handler for the new Blaze button
             if (dom.glazery.blazeActionButton) {
                 dom.glazery.blazeActionButton.onclick = handleBlazeClick;
+            }
+
+            // NEW: Add click handler for the view toggle
+            if (dom.glazery.toggleButton) {
+                dom.glazery.toggleButton.onclick = toggleView;
             }
 
             dom.musicToggleButton.onclick = toggleMusic;
