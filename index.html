@@ -384,10 +384,12 @@
             border-color: #FF9AA2;
         }
 
-        /* NEW CUSTOM TOGGLE SWITCH STYLES */
+        /* CUSTOM TOGGLE STYLES: Smaller and positioned next to the title */
+        
         .price-line {
             display: flex;
-            align-items: center; /* Vertically centers the toggle with the price display */
+            align-items: center; /* Vertically centers the toggle with the label */
+            justify-content: flex-start; /* Aligns content to the left */
         }
         
         .toggle-switch-button {
@@ -397,14 +399,11 @@
             height: 20px; 
             border-radius: 10px;
             cursor: pointer;
-            position: absolute; /* Absolute positioning relative to the 'price-label-container' */
-            right: 120px; /* Position to the left of the button and centered on the price */
-            margin-top: 0px; /* Vertical adjustment */
-            transition: background-color 0.3s, transform 0.3s;
+            transition: background-color 0.3s;
             padding: 2px;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
             flex-shrink: 0;
-            z-index: 20; /* Ensure it stays above other elements */
+            margin-left: 8px; /* Space between "Glaze Price" label and toggle */
             
             /* Initial state: Glaze/Pink */
             background-color: #E75480;
@@ -428,21 +427,31 @@
             justify-content: flex-end; /* Move knob to the right */
         }
         
-        /* The entire action block needs padding consistency */
+        /* FIX: Ensure Glaze/Blaze container overlap correctly without extra margin */
         #glaze-container, #blaze-container {
             padding: 12px;
         }
-
-        /* Specific fix for Blaze container overlap */
-        #blaze-container .price-line {
-            /* Ensure the LP price line is clean */
-            margin-top: 0;
+        
+        /* FIX: Address the overlap issue in the Blaze card by restructuring */
+        #blaze-container .main-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
         }
 
-        #blaze-container .flex-col > div {
-            /* Adjust font size for the large price to avoid overlap with the toggle */
-             font-size: 1.5rem; /* Revert to a slightly smaller size if needed, but flex should handle it */
-             line-height: 1.1;
+        /* FIX: Re-align Price/Balance content within the Blaze card */
+        #blaze-container .price-details {
+            display: flex;
+            flex-direction: column;
+            /* Ensure alignment with Glaze Price */
+            line-height: 1.1; 
+        }
+
+        /* FIX: Ensure the action button and claim amount are correctly stacked */
+        #blaze-container .action-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
         }
     </style>
 </head>
@@ -517,6 +526,7 @@
                             
                             <div class="price-line">
                                 <div class="text-xs font-semibold text-gray-600">Glaze Price</div>
+                                
                                 <div id="mode-switch-toggle-glaze" class="toggle-switch-button" role="switch" aria-checked="true">
                                     <div class="toggle-knob"></div>
                                 </div>
@@ -533,9 +543,9 @@
                 </div>
 
                 <div id="blaze-container" class="bg-tamagotchi-card text-tamagotchi-dark p-2 rounded-tamagotchi-lg shadow-tamagotchi absolute inset-0 hidden">
-                    <div class="flex justify-between items-center">
+                    <div class="main-content">
                         
-                        <div class="flex flex-col">
+                        <div class="price-details">
 
                             <div class="price-line">
                                 <div class="text-xs font-semibold text-gray-600">Blaze Price (LP)</div>
@@ -548,7 +558,7 @@
                             <div id="blaze-available-balance-display" class="text-xs text-gray-500">0.00 LP available</div>
                         </div>
                         
-                        <div class="flex flex-col items-end">
+                        <div class="action-group">
                             <button id="blaze-action-button" class="bg-tamagotchi-button-teal text-white py-2 px-6 rounded-tamagotchi-md text-sm font-bold active:opacity-80 disabled:opacity-50 shadow-tamagotchi">
                                 Blaze
                             </button>
@@ -796,7 +806,7 @@
             };
 
             // =============================================================
-            // UI/TOGGLE FUNCTIONALITY (NEW)
+            // UI/TOGGLE FUNCTIONALITY (FIXED)
             // =============================================================
 
             function toggleContainer_OvalSwitch() {
@@ -806,13 +816,17 @@
                     // Switch to Blaze
                     dom.glazeContainer.classList.add('hidden');
                     dom.blazeContainer.classList.remove('hidden');
-                    dom.blazeContainer.style.marginTop = '0px'; // Align with the container above it
-                    dom.glazeContainer.style.marginTop = '0px'; // Reset/ensure alignment
+                    // Update classes for visual state
+                    dom.modeSwitchToggleGlaze.classList.add('blaze-active'); // Knob goes right (optional for hidden element)
+                    dom.modeSwitchToggleBlaze.classList.add('blaze-active'); // Ensure blaze state is active
                     state.ui.activeContainer = 'blaze';
                 } else {
                     // Switch to Glaze
                     dom.blazeContainer.classList.add('hidden');
                     dom.glazeContainer.classList.remove('hidden');
+                    // Update classes for visual state
+                    dom.modeSwitchToggleGlaze.classList.remove('blaze-active'); // Knob goes left
+                    dom.modeSwitchToggleBlaze.classList.remove('blaze-active'); // Ensure glaze state is active
                     state.ui.activeContainer = 'glaze';
                 }
             }
@@ -1823,6 +1837,15 @@
             if (dom.glazery.blazeActionButton) {
                 dom.glazery.blazeActionButton.onclick = handleBlazeClick;
             }
+            
+            // NEW: Add click handlers for the single oval toggle
+            if (dom.modeSwitchToggleGlaze) {
+                dom.modeSwitchToggleGlaze.onclick = toggleContainer_OvalSwitch;
+            }
+            if (dom.modeSwitchToggleBlaze) {
+                 dom.modeSwitchToggleBlaze.onclick = toggleContainer_OvalSwitch;
+            }
+
 
             dom.musicToggleButton.onclick = toggleMusic;
             dom.sfxToggleButton.onclick = toggleSfx;
