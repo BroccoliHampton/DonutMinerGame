@@ -1727,13 +1727,18 @@
                             // Create a File from the blob
                             const file = new File([blob], 'my-donut.png', { type: 'image/png' });
                             
-                            // Use Farcaster SDK to share
-                            if (FarcasterSDK && typeof FarcasterSDK.actions.cast === 'function') {
-                                await FarcasterSDK.actions.cast({
+                            // Use Farcaster SDK to compose a cast with the image
+                            if (FarcasterSDK && typeof FarcasterSDK.actions.composeCast === 'function') {
+                                const result = await FarcasterSDK.actions.composeCast({
                                     text: '🍩 Check out my custom donut from Pinky Glazers! Play at donut-miner-game.vercel.app',
                                     embeds: [file]
                                 });
-                                console.log('[Share] Cast sent successfully!');
+                                
+                                if (result && result.cast) {
+                                    console.log('[Share] Cast created successfully!', result.cast.hash);
+                                } else {
+                                    console.log('[Share] User cancelled cast');
+                                }
                             } else {
                                 console.error('[Share] Farcaster SDK not available');
                                 // Fallback: download the image
