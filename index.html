@@ -484,9 +484,16 @@
                                 <div id="glaze-price-display" class="text-xl font-extrabold text-tamagotchi-dark">$0.00</div>
                                 <div id="available-balance-display" class="text-xs text-gray-500">$0.00 available</div>
                             </div>
-                            <button id="bakery-action-button" class="bg-tamagotchi-button-pink text-white py-2 px-6 rounded-tamagotchi-md text-sm font-bold active:opacity-80 disabled:opacity-50 shadow-tamagotchi">
-                                Glaze
-                            </button>
+                            
+                            <div class="flex flex-col items-end">
+                                <button id="bakery-action-button" class="bg-tamagotchi-button-pink text-white py-2 px-6 rounded-tamagotchi-md text-sm font-bold active:opacity-80 disabled:opacity-50 shadow-tamagotchi">
+                                    Glaze
+                                </button>
+                                <div class="text-center mt-1">
+                                    <div class="text-xs font-semibold text-gray-600">Donuts/s</div>
+                                    <div id="glaze-dps-display" class="text-sm font-extrabold text-tamagotchi-dark">0.00</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -707,6 +714,9 @@
                     toggleButton: document.getElementById('view-toggle-button'), // NEW ELEMENT
                     glazeContainer: document.getElementById('glaze-container'), // NEW ELEMENT
                     blazeContainer: document.getElementById('blaze-container'), // NEW ELEMENT
+                    
+                    // NEW: Glaze DPS Element for height matching
+                    glazeDpsDisplay: document.getElementById('glaze-dps-display'), // NEW ELEMENT
 
                     // NEW: Blaze elements
                     blazePrice: document.getElementById('blaze-price-display'),
@@ -1151,6 +1161,13 @@
                     const claimEth = parseFloat(blockchainData.blaze.wethAccumulatedFormatted);
                     dom.glazery.blazeClaimAmount.textContent = `${claimEth.toFixed(6)} ETH`;
                 }
+                
+                // === NEW: Update Glaze DPS Display for height matching ===
+                if (dom.glazery.glazeDpsDisplay) {
+                     // Display the DPS from the blockchain data, formatted to 2 decimal places.
+                     dom.glazery.glazeDpsDisplay.textContent = parseFloat(blockchainData.currentDpsFormatted || 0).toFixed(2);
+                }
+                // =========================================================
 
 
                 dom.glazery.donutBalance.textContent = `🍩 ${formatNumber(blockchainData.userDonutBalanceFormatted || 0)}`;
