@@ -19,7 +19,7 @@
             -moz-osx-font-smoothing: grayscale;
             overscroll-behavior: none;
             background-color: #FFC0CB;
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg opacity='0.7'%3E%3Crect x='10' y='10' width='3' height='10' fill='%23FFD700' transform='rotate(25 11.5 15)' /%3E%3Crect x='60' y='30' width='3' height='10' fill='%23FF69B4' transform='rotate(140 61.5 35)' /%3E%3Crect x='30' y='70' width='3' height='10' fill='%2390EE90' transform='rotate(70 31.5 75)' /%3E%3Crect x='80' y='85' width='3' height='10' fill='%2387CEEB' transform='rotate(210 81.5 90)' /%E3%80%89%3Crect x='5' y='45' width='3' height='10' fill='%23FFD700' transform='rotate(100 6.5 50)' /%3E%3Crect x='90' y='5' width='3' height='10' fill='%23FF69B4' transform='rotate(300 91.5 10)' /%3E%3C/g%3E%3C/svg%3E"), 
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg opacity='0.7'%3E%3Crect x='10' y='10' width='3' height='10' fill='%23FFD700' transform='rotate(25 11.5 15)' /%3E%3Crect x='60' y='30' width='3' height='10' fill='%23FF69B4' transform='rotate(140 61.5 35)' /%3E%3Crect x='30' y='70' width='3' height='10' fill='%2390EE90' transform='rotate(70 31.5 75)' /%3E%3Crect x='80' y='85' width='3' height='10' fill='%2387CEEB' transform='rotate(210 81.5 90)' /%3E%3Crect x='5' y='45' width='3' height='10' fill='%23FFD700' transform='rotate(100 6.5 50)' /%3E%3Crect x='90' y='5' width='3' height='10' fill='%23FF69B4' transform='rotate(300 91.5 10)' /%3E%3C/g%3E%3C/svg%3E"), 
                             linear-gradient(135deg, #FFC0CB 0%, #FFDDE1 100%);
             background-size: 200px 200px, cover;
             background-blend-mode: overlay, normal;
@@ -383,6 +383,36 @@
             background: #3D2B1F;
             border-color: #FF9AA2;
         }
+        
+        /* NEW STYLES for the smaller toggle button */
+        .mode-switch-button {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+            z-index: 10; 
+            border: 2px solid #E75480;
+            background-color: #FFDDE1;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: opacity 0.2s, transform 0.1s;
+        }
+        .mode-switch-button:active {
+            transform: translateY(1px);
+            box-shadow: none;
+        }
+        body.dark .mode-switch-button {
+            border-color: #FF9AA2;
+            background-color: #3D2B1F;
+            color: #FF9AA2;
+        }
     </style>
 </head>
 <body class="text-tamagotchi-dark">
@@ -426,15 +456,6 @@
                 </div>
             </div>
 
-            <div class="flex justify-center space-x-2 mt-2">
-                <button id="glaze-toggle" class="nav-button bg-tamagotchi-button-pink w-1/2 py-2 rounded-tamagotchi-md text-sm font-bold shadow-tamagotchi">
-                    <span class="text-xl">🍩 Glaze</span>
-                </button>
-                <button id="blaze-toggle" class="nav-button bg-tamagotchi-button-teal w-1/2 py-2 rounded-tamagotchi-md text-sm font-bold opacity-50 shadow-tamagotchi">
-                    <span class="text-xl">⚡️ Blaze</span>
-                </button>
-            </div>
-
             <div id="top-ticker" class="ticker-wrap" style="margin-bottom: 4px; margin-top: 8px;">
                 <div class="ticker-move">
                     <span>Glaze price doubles each time a new Glazer takes over, and price cools down to $0 over 1 hour. ... Glaze price doubles each time a new Glazer takes over, and price cools down to $0 over 1 hour. ... </span>
@@ -456,9 +477,10 @@
                 </div>
             </div>
             
-            <div id="action-containers" class="relative">
+            <div id="action-containers" class="relative mt-2">
 
-                <div id="glaze-container" class="bg-tamagotchi-card text-tamagotchi-dark p-2 rounded-tamagotchi-lg shadow-tamagotchi">
+                <div id="glaze-container" class="bg-tamagotchi-card text-tamagotchi-dark p-2 rounded-tamagotchi-lg shadow-tamagotchi relative z-10">
+                    <button id="mode-switch-glaze" class="mode-switch-button">🔄</button>
                     <div class="flex justify-between items-center">
                         <div>
                             <div class="text-xs font-semibold text-gray-600">Glaze Price</div>
@@ -471,7 +493,8 @@
                     </div>
                 </div>
 
-                <div id="blaze-container" class="bg-tamagotchi-card text-tamagotchi-dark p-2 rounded-tamagotchi-lg shadow-tamagotchi mt-2 hidden">
+                <div id="blaze-container" class="bg-tamagotchi-card text-tamagotchi-dark p-2 rounded-tamagotchi-lg shadow-tamagotchi absolute inset-0 hidden">
+                    <button id="mode-switch-blaze" class="mode-switch-button">🔄</button>
                     <div class="flex justify-between items-center">
                         <div>
                             <div class="text-xs font-semibold text-gray-600">Blaze Price (LP)</div>
@@ -656,12 +679,12 @@
                 ui: {
                     isDarkMode: false,
                     isSfxMuted: false,
-                    activeContainer: 'glaze' // NEW: Track which container is active
+                    activeContainer: 'glaze' // Track which container is active
                 }
             };
 
             // =============================================================
-            // DOM ELEMENTS (Updated to include new Blaze elements)
+            // DOM ELEMENTS 
             // =============================================================
             const dom = {
                 glazery: {
@@ -681,11 +704,11 @@
                     totalSupply: document.getElementById('total-supply-display'),
                     currentDps: document.getElementById('current-dps-display'),
                     
-                    // NEW: Blaze elements
+                    // Blaze elements
                     blazePrice: document.getElementById('blaze-price-display'),
                     blazeAvailableBalance: document.getElementById('blaze-available-balance-display'),
                     blazeActionButton: document.getElementById('blaze-action-button'),
-                    blazeClaimAmount: document.getElementById('blaze-claim-amount'), // NEW ELEMENT
+                    blazeClaimAmount: document.getElementById('blaze-claim-amount'),
                 },
                 profileName: document.getElementById('player-profile-name'),
                 musicToggleButton: document.getElementById('music-toggle-button'),
@@ -701,15 +724,15 @@
                     currentMiner: document.getElementById('modal-current-miner'),
                 },
                 
-                // NEW: Toggle Elements
+                // Toggle Elements
                 glazeContainer: document.getElementById('glaze-container'),
                 blazeContainer: document.getElementById('blaze-container'),
-                glazeToggle: document.getElementById('glaze-toggle'),
-                blazeToggle: document.getElementById('blaze-toggle'),
+                glazeSwitchButton: document.getElementById('mode-switch-glaze'),
+                blazeSwitchButton: document.getElementById('mode-switch-blaze'),
             };
 
             // =============================================================
-            // HELPER FUNCTIONS (remains the same)
+            // HELPER FUNCTIONS 
             // =============================================================
 
             const formatNumber = (num) => {
@@ -727,24 +750,21 @@
             };
 
             // =============================================================
-            // UI/TOGGLE FUNCTIONALITY (NEW)
+            // UI/TOGGLE FUNCTIONALITY 
             // =============================================================
 
-            function toggleContainer(target) {
-                if (state.ui.activeContainer === target) return;
+            function toggleContainer() {
+                // Determine the target mode
+                const target = state.ui.activeContainer === 'glaze' ? 'blaze' : 'glaze';
                 playSoundEffect('crunch');
                 
                 if (target === 'glaze') {
                     dom.glazeContainer.classList.remove('hidden');
-                    dom.glazeToggle.classList.remove('opacity-50');
                     dom.blazeContainer.classList.add('hidden');
-                    dom.blazeToggle.classList.add('opacity-50');
                     state.ui.activeContainer = 'glaze';
                 } else if (target === 'blaze') {
-                    dom.glazeContainer.classList.add('hidden');
-                    dom.glazeToggle.classList.add('opacity-50');
                     dom.blazeContainer.classList.remove('hidden');
-                    dom.blazeToggle.classList.remove('opacity-50');
+                    dom.glazeContainer.classList.add('hidden');
                     state.ui.activeContainer = 'blaze';
                 }
             }
@@ -1756,12 +1776,12 @@
                 dom.glazery.blazeActionButton.onclick = handleBlazeClick;
             }
             
-            // NEW: Add click handlers for the toggles
-            if (dom.glazeToggle) {
-                dom.glazeToggle.onclick = () => toggleContainer('glaze');
+            // NEW: Add click handlers for the corner switch icons
+            if (dom.glazeSwitchButton) {
+                dom.glazeSwitchButton.onclick = toggleContainer;
             }
-            if (dom.blazeToggle) {
-                dom.blazeToggle.onclick = () => toggleContainer('blaze');
+            if (dom.blazeSwitchButton) {
+                dom.blazeSwitchButton.onclick = toggleContainer;
             }
 
 
