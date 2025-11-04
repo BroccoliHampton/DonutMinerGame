@@ -1010,17 +1010,38 @@
                     const txHash = await sendTxWithRetry(provider, txParams);
                     
                     console.log('[Blaze] Approval transaction sent:', txHash);
-                    console.log('Approval submitted! Now you can Blaze.');
+                    console.log('Approval submitted! Waiting for confirmation...');
                     
-                    // Update approval status
-                    blockchainData.blaze.userNeedsApproval = false;
-                    updateBlazeryUI();
+                    // Wait for transaction to be mined (poll every 2 seconds for up to 30 seconds)
+                    let confirmed = false;
+                    const maxAttempts = 15;
                     
-                    // Refresh state after approval
-                    setTimeout(() => {
-                        console.log('[Blaze] Refreshing after approval...');
+                    for (let i = 0; i < maxAttempts && !confirmed; i++) {
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        console.log(`[Blaze] Checking approval status (attempt ${i + 1}/${maxAttempts})...`);
+                        
+                        // Fetch fresh state to check approval
+                        const response = await fetch(`${API_BASE_URL}/api/get-game-state?userAddress=${address}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.blaze && data.blaze.userNeedsApproval === false) {
+                                confirmed = true;
+                                console.log('[Blaze] ✅ Approval confirmed on-chain!');
+                            }
+                        }
+                    }
+                    
+                    if (confirmed) {
+                        // Update approval status only after confirmation
+                        blockchainData.blaze.userNeedsApproval = false;
+                        updateBlazeryUI();
+                        console.log('Approval confirmed! Click Blaze again to proceed.');
+                        
+                        // Final refresh
                         fetchGameState(blockchainData.userAddress);
-                    }, 3000);
+                    } else {
+                        console.log('[Blaze] ⚠️ Approval transaction sent but not yet confirmed. Please wait and try again.');
+                    }
                     
                 } catch (error) {
                     console.error('[Blaze] Approval error:', error);
