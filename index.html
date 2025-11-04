@@ -385,15 +385,19 @@
         }
 
         /* NEW CUSTOM TOGGLE SWITCH STYLES */
-        .toggle-switch-glaze {
+        .toggle-switch-container {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 60px; /* Width of the oval container */
-            height: 24px;
-            border-radius: 12px;
+            align-items: center; /* Vertically centers toggle with label/price */
+        }
+        
+        .toggle-switch-button {
+            display: flex;
+            align-items: center; 
+            justify-content: flex-start; /* Start on the left (Glaze/Pink) */
+            width: 40px; /* Smaller width */
+            height: 20px; /* Smaller height */
+            border-radius: 10px;
             cursor: pointer;
-            position: relative;
             background-color: #E75480; /* Pink background for GLOW (Glaze) */
             transition: background-color 0.3s;
             padding: 2px;
@@ -403,23 +407,24 @@
             margin-left: 8px;
         }
 
-        .toggle-switch-blaze {
-            background-color: #66CCBF; /* Teal background for BLAZE (Blaze) */
-            border: 2px solid #50A89C;
-        }
-
         .toggle-knob {
-            width: 18px;
-            height: 18px;
+            width: 14px; /* Smaller knob */
+            height: 14px;
             border-radius: 50%;
             background: white;
             box-shadow: 0 1px 3px rgba(0,0,0,0.5);
             transition: transform 0.3s;
         }
 
-        /* Position the knob for Blaze (right side) */
+        /* State for BLAZE (Knob right, Teal background) */
+        .toggle-switch-blaze {
+            background-color: #66CCBF; /* Teal background for BLAZE */
+            border-color: #50A89C;
+            justify-content: flex-end;
+        }
+
         .toggle-switch-blaze .toggle-knob {
-            transform: translateX(34px); /* 60px width - 2px padding*2 - 18px knob = 38px travel (use 34px for alignment) */
+            transform: translateX(0); /* Knob already on right due to justify-content: flex-end */
         }
     </style>
 </head>
@@ -489,6 +494,7 @@
 
                 <div id="glaze-container" class="bg-tamagotchi-card text-tamagotchi-dark p-2 rounded-tamagotchi-lg shadow-tamagotchi relative z-10">
                     <div class="flex justify-between items-center">
+                        
                         <div class="flex items-center">
                             <div class="flex flex-col">
                                 <div class="text-xs font-semibold text-gray-600">Glaze Price</div>
@@ -496,7 +502,7 @@
                                 <div id="available-balance-display" class="text-xs text-gray-500">$0.00 available</div>
                             </div>
                             
-                            <div id="mode-switch-toggle" class="toggle-switch-glaze">
+                            <div id="mode-switch-toggle" class="toggle-switch-button" role="switch" aria-checked="true">
                                 <div class="toggle-knob"></div>
                             </div>
                         </div>
@@ -509,6 +515,7 @@
 
                 <div id="blaze-container" class="bg-tamagotchi-card text-tamagotchi-dark p-2 rounded-tamagotchi-lg shadow-tamagotchi absolute inset-0 hidden">
                     <div class="flex justify-between items-center">
+                        
                         <div class="flex items-center">
                             <div class="flex flex-col">
                                 <div class="text-xs font-semibold text-gray-600">Blaze Price (LP)</div>
@@ -516,7 +523,7 @@
                                 <div id="blaze-available-balance-display" class="text-xs text-gray-500">0.00 LP available</div>
                             </div>
 
-                            <div id="mode-switch-toggle-blaze" class="toggle-switch-glaze toggle-switch-blaze">
+                            <div id="mode-switch-toggle-blaze" class="toggle-switch-button toggle-switch-blaze" role="switch" aria-checked="false">
                                 <div class="toggle-knob"></div>
                             </div>
                         </div>
@@ -698,7 +705,7 @@
                 ui: {
                     isDarkMode: false,
                     isSfxMuted: false,
-                    activeContainer: 'glaze' // Track which container is active
+                    activeContainer: 'glaze' // NEW: Track which container is active
                 }
             };
 
@@ -772,32 +779,6 @@
             // UI/TOGGLE FUNCTIONALITY (NEW)
             // =============================================================
 
-            function toggleContainer() {
-                // Determine the target mode
-                const target = state.ui.activeContainer === 'glaze' ? 'blaze' : 'glaze';
-                playSoundEffect('crunch');
-                
-                if (target === 'glaze') {
-                    dom.glazeContainer.classList.remove('hidden');
-                    dom.blazeContainer.classList.add('hidden');
-                    dom.modeSwitchToggle.classList.remove('toggle-switch-blaze');
-                    dom.modeSwitchToggleBlaze.classList.add('hidden'); // Hide the blaze toggle too
-                    dom.modeSwitchToggle.classList.remove('hidden'); // Show glaze toggle
-                    state.ui.activeContainer = 'glaze';
-                } else if (target === 'blaze') {
-                    dom.blazeContainer.classList.remove('hidden');
-                    dom.glazeContainer.classList.add('hidden');
-                    dom.modeSwitchToggle.classList.add('toggle-switch-blaze');
-                    dom.modeSwitchToggleBlaze.classList.remove('hidden'); // Show blaze toggle
-                    dom.modeSwitchToggle.classList.add('hidden'); // Hide glaze toggle
-                    state.ui.activeContainer = 'blaze';
-                }
-            }
-            
-            // Re-implementing toggle to use one set of IDs since the design requires the toggle to be *in* the active container. 
-            // Instead of hiding the whole container and showing the other, we will update the inner content and styles of the main 'action-containers' parent if we were using just one element.
-            // Since we are using two separate containers (#glaze-container and #blaze-container) and positioning them absolutely, we need to hide one and show the other.
-            
             function toggleContainer_OvalSwitch() {
                 playSoundEffect('crunch');
                 
