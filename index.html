@@ -1054,7 +1054,7 @@
                 // Update claimable ETH (what user gets)
                 if (dom.glazery.blazeClaimAmount) {
                     const ethAmount = parseFloat(blockchainData.blaze.wethBalanceFormatted);
-                    dom.glazery.blazeClaimAmount.textContent = `${ethAmount.toFixed(8)} ETH`;
+                    dom.glazery.blazeClaimAmount.textContent = `${ethAmount.toFixed(6)} ETH`;
                 }
                 
                 // Update user's LP balance
