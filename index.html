@@ -19,7 +19,7 @@
             -moz-osx-font-smoothing: grayscale;
             overscroll-behavior: none;
             background-color: #FFC0CB;
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg opacity='0.7'%3E%3Crect x='10' y='10' width='3' height='10' fill='%23FFD700' transform='rotate(25 11.5 15)' /%3E%3Crect x='60' y='30' width='3' height='10' fill='%23FF69B4' transform='rotate(140 61.5 35)' /%3E%3Crect x='30' y='70' width='3' height='10' fill='%2390EE90' transform='rotate(70 31.5 75)' /%3E%3Crect x='80' y='85' width='3' height='10' fill='%2387CEEB' transform='rotate(210 81.5 90)' /%3E%3Crect x='5' y='45' width='3' height='10' fill='%23FFD700' transform='rotate(100 6.5 50)' /%3E%3Crect x='90' y='5' width='3' height='10' fill='%23FF69B4' transform='rotate(300 91.5 10)' /%3E%3C/g%3E%3C/svg%3E"), 
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg opacity='0.7'%3E%3Crect x='10' y='10' width='3' height='10' fill='%23FFD700' transform='rotate(25 11.5 15)' /%3E%3Crect x='60' y='30' width='3' height='10' fill='%23FF69B4' transform='rotate(140 61.5 35)' /%3E%3Crect x='30' y='70' width='3' height='10' fill='%2390EE90' transform='rotate(70 31.5 75)' /%3E%3Crect x='80' y='85' width='3' height='10' fill='%2387CEEB' transform='rotate(210 81.5 90)' /%E3%80%89%3Crect x='5' y='45' width='3' height='10' fill='%23FFD700' transform='rotate(100 6.5 50)' /%3E%3Crect x='90' y='5' width='3' height='10' fill='%23FF69B4' transform='rotate(300 91.5 10)' /%3E%3C/g%3E%3C/svg%3E"), 
                             linear-gradient(135deg, #FFC0CB 0%, #FFDDE1 100%);
             background-size: 200px 200px, cover;
             background-blend-mode: overlay, normal;
@@ -179,7 +179,7 @@
 
         @keyframes scanline {
             0% { background-position: 0 0; }
-            100% { background-position: 0 100%; }
+            100% { transform: translate(0, 100%); }
         }
 
         .falling-snow {
@@ -387,7 +387,8 @@
 </head>
 <body class="text-tamagotchi-dark">
         
-    <main class="flex-grow flex flex-col px-3 pt-4 pb-1 max-w-lg mx-auto w-full"> <div class="flex justify-between items-center mb-2">
+    <main class="flex-grow flex flex-col px-3 pt-4 pb-1 max-w-lg mx-auto w-full"> 
+        <div class="flex justify-between items-center mb-2">
             <div class="flex flex-col">
                 <h1 class="text-3xl font-black text-tamagotchi-pink-dark" style="font-family: 'Luckiest Guy', cursive;">Pinky Glazers</h1>
                 
@@ -799,7 +800,7 @@
             async function openGlazeFrame() {
                 console.log('[Blockchain] Starting transaction...');
                 donutSpinSpeed = 0.5;
-                playSoundEffect('purchase');
+                // Removed playSoundEffect('purchase')
                 
                 try {
                     if (!FarcasterSDK) throw new Error("SDK not initialized.");
@@ -869,8 +870,7 @@
                 
                 // *** REMOVED THE USER IS MINER CHECK (FIX 5) ***
                 
-                // Play a sound effect to acknowledge the click
-                playSoundEffect('purchase'); 
+                // Removed playSoundEffect('purchase');
                 
                 // Always open the glaze frame to initiate a transaction
                 openGlazeFrame();
@@ -879,7 +879,7 @@
             // NEW: Handle Blaze/Buy click - works like Glaze (direct transaction)
             async function handleBlazeClick() {
                 console.log('[Blaze] Blaze button clicked');
-                playSoundEffect('purchase');
+                // Removed playSoundEffect('purchase');
                 donutSpinSpeed = 0.5; // Spin the donut
                 
                 try {
@@ -1132,7 +1132,7 @@
 
 
             // =============================================================
-            // AUDIO SETUP (Tone.js) - KEEPING ORIGINAL
+            // AUDIO SETUP (Tone.js) - FIXED TIMING ISSUE
             // =============================================================
             let kick, hiHat, bass, melody;
             let kickSequence, hiHatSequence, bassSequence, melodySequence;
@@ -1227,13 +1227,16 @@
                     initAudio();
                 }
                 
+                const now = Tone.now(); 
+                const offset = 0.001; // Added offset to prevent timing errors
+
                 if (sound === 'crunch') {
-                    cuteClickSound.triggerAttackRelease('C6', '32n', Tone.now());
+                    cuteClickSound.triggerAttackRelease('C6', '32n', now + offset);
                 }
                 if (sound === 'purchase') {
-                    purchaseSound.triggerAttackRelease('C5', '16n', Tone.now());
-                    purchaseSound.triggerAttackRelease('E5', '16n', Tone.now() + 0.05);
-                    purchaseSound.triggerAttackRelease('G5', '16n', Tone.now() + 0.1);
+                    purchaseSound.triggerAttackRelease('C5', '16n', now + offset);
+                    purchaseSound.triggerAttackRelease('E5', '16n', now + 0.05 + offset);
+                    purchaseSound.triggerAttackRelease('G5', '16n', now + 0.1 + offset);
                 }
             }
             
