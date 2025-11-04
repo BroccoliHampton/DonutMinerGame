@@ -955,17 +955,33 @@
                     const txHash = await sendTxWithRetry(provider, txParams);
                     
                     console.log('[Blaze] Approval transaction sent:', txHash);
-                    console.log('Approval submitted! Now you can Blaze.');
+                    console.log('Approval submitted! Waiting for confirmation...');
                     
-                    // Update approval status
-                    blockchainData.blaze.userNeedsApproval = false;
-                    updateBlazeryUI();
+                    // Wait for transaction to be confirmed (poll every 2 seconds, up to 30 seconds)
+                    let confirmed = false;
+                    let attempts = 0;
+                    const maxAttempts = 15; // 30 seconds total
                     
-                    // Refresh state after approval
-                    setTimeout(() => {
-                        console.log('[Blaze] Refreshing after approval...');
-                        fetchGameState(blockchainData.userAddress);
-                    }, 3000);
+                    while (!confirmed && attempts < maxAttempts) {
+                        attempts++;
+                        console.log(`[Blaze] Checking approval status (attempt ${attempts}/${maxAttempts})...`);
+                        
+                        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+                        
+                        // Fetch updated game state to check if approval went through
+                        await fetchGameState(address);
+                        
+                        // Check if approval is no longer needed
+                        if (!blockchainData.blaze.userNeedsApproval) {
+                            confirmed = true;
+                            console.log('[Blaze] Approval confirmed! You can now Blaze.');
+                            updateBlazeryUI();
+                        }
+                    }
+                    
+                    if (!confirmed) {
+                        console.log('[Blaze] Approval taking longer than expected. Try clicking Blaze again in a moment.');
+                    }
                     
                 } catch (error) {
                     console.error('[Blaze] Approval error:', error);
