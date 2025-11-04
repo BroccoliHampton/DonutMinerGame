@@ -297,11 +297,6 @@
             text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
         }
 
-        @keyframes scroll-ticker {
-            0% { transform: translateX(0%); }
-            100% { transform: translateX(-50%); }
-        }
-
         @keyframes scroll-ticker-reverse {
             0% { transform: translateX(-50%); }
             100% { transform: translateX(0%); }
@@ -1246,8 +1241,20 @@
                     envelope: { attack: 0.01, decay: 0.2, sustain: 0.3, release: 0.5 }
                 }).connect(limiter);
 
-                // FIXED BASS PATTERN: Ensures the pattern length is 128 (8n steps) and ends cleanly for looping.
-                const bassPattern = ['C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null];
+                // FIXED BASS PATTERN: 16 bars (128 steps) ensuring the harmonic change is on the downbeat of bar 5 and bar 9.
+                const bassPattern = [
+                    'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, // Bar 1-2 (C minor)
+                    'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, 'C2', null, 'G2', null, // Bar 3-4 (C minor)
+                    
+                    'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, // Bar 5-6 (G# minor)
+                    'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, 'G#1', null, 'D#2', null, // Bar 7-8 (G# minor)
+
+                    'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, // Bar 9-10 (F minor)
+                    'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, 'F1', null, 'C2', null, // Bar 11-12 (F minor)
+
+                    'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, // Bar 13-14 (G minor)
+                    'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null, 'G1', null, 'D2', null // Bar 15-16 (G minor - Loop Point)
+                ];
 
                 bassSequence = new Tone.Sequence((time, note) => {
                     if (note) bass.triggerAttackRelease(note, '8n', time);
