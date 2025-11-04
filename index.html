@@ -1064,25 +1064,12 @@
                 }
                 
                 // Update button state
-                const blazeButton = dom.glazery.blazeActionButton;
-                if (blazeButton) {
-                    const hasEnoughLp = parseFloat(blockchainData.blaze.userLpBalance) >= parseFloat(blockchainData.blaze.price);
-                    const needsApproval = blockchainData.blaze.userNeedsApproval;
-                    
-                    if (!blockchainData.userAddress) {
-                        blazeButton.textContent = 'Connect Wallet';
-                        blazeButton.disabled = false;
-                    } else if (needsApproval) {
-                        blazeButton.textContent = 'Approve LP';
-                        blazeButton.disabled = false;
-                    } else if (!hasEnoughLp) {
-                        blazeButton.textContent = 'Insufficient LP';
-                        blazeButton.disabled = true;
-                    } else {
-                        blazeButton.textContent = 'Blaze 🔥';
-                        blazeButton.disabled = false;
-                    }
-                }
+const blazeButton = dom.glazery.blazeActionButton;
+if (blazeButton) {
+    // Always show "Blaze 🔥" and never disable
+    blazeButton.textContent = 'Blaze 🔥';
+    blazeButton.disabled = false;
+}
                 
                 console.log('[Blaze] UI updated successfully');
             }
