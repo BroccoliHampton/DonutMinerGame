@@ -19,7 +19,7 @@
             -moz-osx-font-smoothing: grayscale;
             overscroll-behavior: none;
             background-color: #FFC0CB;
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg opacity='0.7'%3E%3Crect x='10' y='10' width='3' height='10' fill='%23FFD700' transform='rotate(25 11.5 15)' /%3E%3Crect x='60' y='30' width='3' height='10' fill='%23FF69B4' transform='rotate(140 61.5 35)' /%3E%3Crect x='30' y='70' width='3' height='10' fill='%2390EE90' transform='rotate(70 31.5 75)' /%3E%3Crect x='80' y='85' width='3' height='10' fill='%2387CEEB' transform='rotate(210 81.5 90)' /%E3%80%89%3Crect x='5' y='45' width='3' height='10' fill='%23FFD700' transform='rotate(100 6.5 50)' /%3E%3Crect x='90' y='5' width='3' height='10' fill='%23FF69B4' transform='rotate(300 91.5 10)' /%3E%3C/g%3E%3C/svg%3E"), 
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg opacity='0.7'%3E%3Crect x='10' y='10' width='3' height='10' fill='%23FFD700' transform='rotate(25 11.5 15)' /%3E%3Crect x='60' y='30' width='3' height='10' fill='%23FF69B4' transform='rotate(140 61.5 35)' /%3Crect x='30' y='70' width='3' height='10' fill='%2390EE90' transform='rotate(70 31.5 75)' /%3Crect x='80' y='85' width='3' height='10' fill='%2387CEEB' transform='rotate(210 81.5 90)' /%E3%80%89%3Crect x='5' y='45' width='3' height='10' fill='%23FFD700' transform='rotate(100 6.5 50)' /%3E%3Crect x='90' y='5' width='3' height='10' fill='%23FF69B4' transform='rotate(300 91.5 10)' /%3E%3C/g%3E%3C/svg%3E"), 
                             linear-gradient(135deg, #FFC0CB 0%, #FFDDE1 100%);
             background-size: 200px 200px, cover;
             background-blend-mode: overlay, normal;
@@ -304,7 +304,7 @@
         
         body.dark {
             background-color: #5C3317;
-            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%236B4A34' fill-opacity='0.4'%3E%3Cpath d='M10 0L0 10l10 10 10-10z'/%E3%80%89%3Cpath d='M0 10L10 20l10-10L10 0z'/%E3%80%89%3C/g%E3%80%89%3C/svg%3E"), 
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%236B4A34' fill-opacity='0.4'%3E%3Cpath d='M10 0L0 10l10 10 10-10z'/%3E%3Cpath d='M0 10L10 20l10-10L10 0z'/%3E%3C/g%3E%3C/svg%3E"), 
                             linear-gradient(135deg, #5C3317 0%, #3D2B1F 100%);
         }
 
@@ -842,8 +842,13 @@
                         console.log('[Blockchain] *** wethAccumulated (claimable):', blockchainData.blaze.wethAccumulatedFormatted);
                     }
                     
-                    updateUI();
-                    updateBlazeryUI(); // NEW: Update Blaze UI
+                    // ** DEFENSIVE FIX: Wrap UI updates in a try/catch **
+                    try {
+                        updateUI();
+                        updateBlazeryUI(); // NEW: Update Blaze UI
+                    } catch (renderError) {
+                        console.error('[Rendering Error] Failed to update UI after fetch (WASM crash likely):', renderError.message);
+                    }
                     
                     return data;
                 } catch (error) {
@@ -1233,7 +1238,7 @@
                     envelope: { attack: 0.001, decay: 0.3, sustain: 0.01, release: 0.2 }
                 }).connect(limiter);
                 
-                const kickPattern = ['C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'GC5', null];
+                const kickPattern = ['C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'C2', null, null, null, 'GC5', null];
                 
                 kickSequence = new Tone.Sequence((time, note) => {
                     if (note) kick.triggerAttackRelease(note, '8n', time);
