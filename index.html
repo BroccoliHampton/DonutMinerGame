@@ -6,6 +6,12 @@
     <title>Pinky Glazers ツ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- NEW: Post-processing essentials -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+    <!-- End Post-processing essentials -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <style>
         /* [KEEPING ALL THE ORIGINAL STYLES - NO CHANGES] */
@@ -409,6 +415,12 @@
             background: #3D2B1F;
             border-color: #FF9AA2;
         }
+
+        /* NEW: Filter classes for the canvas container */
+        .blaze-active {
+            filter: contrast(1.2) brightness(0.9);
+            transition: filter 0.5s ease-in-out;
+        }
     </style>
 </head>
 <body class="text-tamagotchi-dark">
@@ -458,6 +470,7 @@
                 </div>
             </div>
 
+            <!-- MODIFIED: Added blaze-active class toggle logic in JS later -->
             <div id="cookie-rain-container" class="relative h-56 flex items-center justify-center overflow-hidden bg-tamagotchi-card rounded-tamagotchi-lg shadow-tamagotchi glitch-static">
                 <div class="falling-snow"></div>
                 <canvas id="cookie-canvas"></canvas>
@@ -1214,15 +1227,24 @@
             function toggleView() {
                 playSoundEffect('crunch');
                 state.ui.isGlazeView = !state.ui.isGlazeView;
-
+                
+                // NEW: Toggle the post-processing effect and CSS filter
                 if (state.ui.isGlazeView) {
                     dom.glazery.glazeContainer.classList.remove('hidden');
                     dom.glazery.blazeContainer.classList.add('hidden');
                     dom.glazery.toggleButton.textContent = '🧊'; // Ice cube for Glaze view
+                    dom.glazery.rainContainer.classList.remove('blaze-active');
+                    if (composer) {
+                        composer.enabled = false;
+                    }
                 } else {
                     dom.glazery.glazeContainer.classList.add('hidden');
                     dom.glazery.blazeContainer.classList.remove('hidden');
                     dom.glazery.toggleButton.textContent = '🔥'; // Flame for Blaze view
+                    dom.glazery.rainContainer.classList.add('blaze-active');
+                    if (composer) {
+                        composer.enabled = true;
+                    }
                 }
             }
 
@@ -1263,7 +1285,7 @@
                     envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.05 }
                 }).connect(limiter);
 
-                const hiHatPattern = [null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'GC5', null];
+                const hiHatPattern = [null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'G5', null, null, null, 'GC5', null];
 
                 hiHatSequence = new Tone.Sequence((time, note) => {
                     if (note) hiHat.triggerAttackRelease('8n', time);
@@ -1410,7 +1432,7 @@
             }
 
             // =============================================================
-            // 3D GLAZERY SETUP - KEEPING ALL ORIGINAL CODE
+            // 3D GLAZERY SETUP - START OF NEW/MODIFIED THREE.JS CODE
             // =============================================================
 
             let scene, camera, renderer, donutGroup, glazeMaterial, donutMaterial, sprinkleMeshes = [];
@@ -1421,6 +1443,53 @@
             let currentCameraZ = 10;
             let isThreeJSInitialized = false; 
             let donutSpinSpeed = 0.005;
+
+            // NEW: Post-processing variables
+            let composer;
+            let inversionPass;
+
+            // NEW: Custom Negative/Blaze Shader
+            const NegativeShader = {
+                uniforms: {
+                    "tDiffuse": { value: null },
+                    "time":     { value: 0.0 }
+                },
+
+                vertexShader: [
+                    "varying vec2 vUv;",
+                    "void main() {",
+                        "vUv = uv;",
+                        "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+                    "}"
+                ].join( "\n" ),
+
+                fragmentShader: [
+                    "uniform float time;",
+                    "uniform sampler2D tDiffuse;",
+                    "varying vec2 vUv;",
+                    
+                    "void main() {",
+                        "vec4 texel = texture2D( tDiffuse, vUv );",
+                        
+                        // Invert Colors (Negative Effect)
+                        "vec3 inverted = vec3(1.0 - texel.r, 1.0 - texel.g, 1.0 - texel.b);",
+
+                        // Color Shift / Glitch (Subtle Eerie Hue)
+                        // Uses a small time-based shift on the green channel to make it feel unstable
+                        "float t = sin(time * 0.5) * 0.05 + 0.05;",
+                        "inverted.r = inverted.r * (1.0 - t * 0.5);",
+                        "inverted.g = inverted.g + t;",
+                        "inverted.b = inverted.b * (1.0 - t * 0.8);",
+
+                        // Apply Contrast boost to make it pop and look surreal
+                        "float contrast = 1.3;",
+                        "inverted = (inverted - 0.5) * contrast + 0.5;",
+
+                        "gl_FragColor = vec4(inverted, texel.a);",
+                    "}"
+                ].join( "\n" )
+            };
+
 
             const MIN_ZOOM_Z = 3;
             const MAX_ZOOM_Z = 20;
@@ -1525,6 +1594,15 @@
                 });
                 renderer.setSize(w, h);
                 renderer.setPixelRatio(window.devicePixelRatio);
+
+                // NEW: Initialize Post-processing (Composer)
+                composer = new THREE.EffectComposer(renderer);
+                composer.addPass(new THREE.RenderPass(scene, camera));
+
+                // NEW: Add the custom negative shader pass (disabled initially)
+                inversionPass = new THREE.ShaderPass(NegativeShader);
+                composer.addPass(inversionPass);
+                composer.enabled = false; // Start disabled
 
                 const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
                 scene.add(ambientLight);
@@ -1685,10 +1763,16 @@
                         camera.aspect = w / h;
                         camera.updateProjectionMatrix();
                         renderer.setSize(w, h);
+                        // NEW: Update composer size on resize
+                        if (composer) {
+                            composer.setSize(w, h);
+                        }
                     }
                 }
             }
             window.addEventListener('resize', onResize);
+
+            let clock = new THREE.Clock(); // NEW: Clock for shader time uniform
 
             function animate() {
                 requestAnimationFrame(animate);
@@ -1705,7 +1789,14 @@
                     
                     // ** CRITICAL: Render call inside a try/catch to isolate WASM issues **
                     try {
-                        renderer.render(scene, camera);
+                        // MODIFIED: Use composer to render if enabled, otherwise use raw renderer
+                        if (composer && composer.enabled) {
+                            // Update shader uniforms
+                            inversionPass.uniforms[ 'time' ].value = clock.getElapsedTime();
+                            composer.render();
+                        } else {
+                            renderer.render(scene, camera);
+                        }
                     } catch (e) {
                         // This prevents the CanvasKit crash from stopping the entire animation frame loop
                         console.error('[WASM Render Crash] Animation frame failed:', e.message);
