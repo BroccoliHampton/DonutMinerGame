@@ -1023,12 +1023,17 @@
                     
                     // ==========================================================
                     // *** CRITICAL FIX: WAIT FOR CONFIRMATION (requires Ethers) ***
-                    // We must create an Ethers provider to wait for the transaction. 
-                    // Ethers is now available globally due to the header script tag.
+                    
+                    // Verify if ethers is defined before use
+                    if (typeof ethers === 'undefined' || !ethers.providers || !ethers.providers.JsonRpcProvider) {
+                        throw new Error("Ethers library is not fully loaded or defined.");
+                    }
+                    
                     const waitProvider = new ethers.providers.JsonRpcProvider('https://mainnet.base.org');
                     console.log('[Blaze] Waiting for transaction to be confirmed on Base...');
                     
-                    const receipt = await waitProvider.waitForTransaction(txHash, 1, 60000); // 1 confirmation, 60s timeout
+                    // 60s timeout for waiting for the transaction to be mined
+                    const receipt = await waitProvider.waitForTransaction(txHash, 1, 60000); 
                     
                     if (receipt.status !== 1) {
                          throw new Error("Approval transaction reverted on chain.");
@@ -1047,7 +1052,7 @@
                         // Call the main handler to immediately proceed to the 'Blaze' transaction
                         handleBlazeClick();
                     } else {
-                        // This case should ideally not happen if the TX confirmed successfully.
+                        // This case should ideally not happen if the TX confirmed successfully and the state was fetched.
                         console.log('[Blaze] Approval confirmed but state still reports needs approval. Check node indexing lag.');
                         updateBlazeryUI();
                     }
