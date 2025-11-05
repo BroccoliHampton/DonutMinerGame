@@ -848,6 +848,8 @@
                         updateBlazeryUI(); // NEW: Update Blaze UI
                     } catch (renderError) {
                         console.error('[Rendering Error] Failed to update UI after fetch (WASM crash likely):', renderError.message);
+                        // Prevent the WASM crash from stopping the refresh loop
+                        return;
                     }
                     
                     return data;
@@ -960,12 +962,13 @@
                     }
                     
                     // Check if user has enough LP tokens
-                    const lpBalance = parseFloat(blockchainData.blaze.userLpBalance);
-                    const lpNeeded = parseFloat(blockchainData.blaze.price);
+                    const lpBalance = parseFloat(blockchainData.blaze.userLpBalanceFormatted);
+                    const lpNeeded = parseFloat(ethers.utils.formatEther(blockchainData.blaze.price));
                     
                     if (lpBalance < lpNeeded) {
                         console.log('[Blaze] Insufficient LP balance');
                         console.log(`Need ${lpNeeded.toFixed(4)} LP but only have ${lpBalance.toFixed(4)} LP`);
+                        // Consider playing a negative SFX or showing an error message to the user
                         return;
                     }
                     
@@ -1017,7 +1020,7 @@
                     console.log('[Blaze] Approval transaction sent:', txHash);
                     console.log('Approval submitted! Now you can Blaze.');
                     
-                    // Update approval status
+                    // Update approval status optimistically
                     blockchainData.blaze.userNeedsApproval = false;
                     updateBlazeryUI();
                     
@@ -1093,6 +1096,9 @@
                 
                 console.log('[Blaze] Updating UI');
                 
+                const userNeedsApproval = blockchainData.blaze.userNeedsApproval;
+                const blazeButton = dom.glazery.blazeActionButton;
+                
                 // Update LP price (what user pays)
                 if (dom.glazery.blazePrice) {
                     const lpAmount = parseFloat(blockchainData.blaze.priceFormatted);
@@ -1111,12 +1117,19 @@
                     dom.glazery.blazeAvailableBalance.textContent = `${userLpBalance.toFixed(4)} LP available`;
                 }
                 
-                // Update button state
-                const blazeButton = dom.glazery.blazeActionButton;
+                // *** CRITICAL BUTTON LOGIC FIX ***
                 if (blazeButton) {
-                // Always show "Blaze" and never disable
-                blazeButton.textContent = 'Blaze';
-                 blazeButton.disabled = false;
+                    if (userNeedsApproval) {
+                        blazeButton.textContent = 'Approve LP';
+                        blazeButton.disabled = false; // Always allow approval attempt
+                    } else {
+                         // Check if user has enough LP tokens before enabling "Blaze"
+                        const lpBalance = parseFloat(blockchainData.blaze.userLpBalanceFormatted);
+                        const lpNeeded = parseFloat(blockchainData.blaze.priceFormatted);
+                        
+                        blazeButton.textContent = 'Blaze';
+                        blazeButton.disabled = lpBalance < lpNeeded;
+                    }
                 }
                 
                 console.log('[Blaze] UI updated successfully');
@@ -1690,7 +1703,13 @@
                         }
                     }
                     
-                    renderer.render(scene, camera);
+                    // ** CRITICAL: Render call inside a try/catch to isolate WASM issues **
+                    try {
+                        renderer.render(scene, camera);
+                    } catch (e) {
+                        // This prevents the CanvasKit crash from stopping the entire animation frame loop
+                        console.error('[WASM Render Crash] Animation frame failed:', e.message);
+                    }
                 }
             }
 
