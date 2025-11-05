@@ -861,7 +861,7 @@
 
             async function openGlazeFrame() {
                 console.log('[Blockchain] Starting transaction...');
-                donutSpinSpeed = 0.5;
+                // DONUT SPIN FIX: donutSpinSpeed = 0.5; // REMOVED THIS LINE
                 // Removed playSoundEffect('purchase')
                 
                 try {
@@ -942,7 +942,7 @@
             async function handleBlazeClick() {
                 console.log('[Blaze] Blaze button clicked');
                 // Removed playSoundEffect('purchase');
-                donutSpinSpeed = 0.5; // Spin the donut
+                // DONUT SPIN FIX: donutSpinSpeed = 0.5; // REMOVED THIS LINE
                 
                 try {
                     if (!FarcasterSDK) throw new Error("SDK not initialized.");
@@ -981,7 +981,7 @@
                 }
             }
             
-            // NEW: Send LP token approval transaction
+            // NEW: Send LP token approval transaction - FIX SEQUENCE AND WAIT
             async function sendApprovalTransaction(address) {
                 try {
                     console.log('[Blaze] Fetching approval transaction data...');
@@ -1018,17 +1018,25 @@
                     const txHash = await sendTxWithRetry(provider, txParams);
                     
                     console.log('[Blaze] Approval transaction sent:', txHash);
-                    console.log('Approval submitted! Now you can Blaze.');
+                    console.log('Approval submitted! Waiting for confirmation to proceed to Blaze...');
                     
-                    // Update approval status optimistically
-                    blockchainData.blaze.userNeedsApproval = false;
-                    updateBlazeryUI();
+                    // --- CRITICAL FIX: Wait for full refresh then call Blaze ---
+                    // Wait for 3 seconds minimum for confirmation (or use a dedicated checker if available)
+                    await new Promise(resolve => setTimeout(resolve, 3000));
                     
-                    // Refresh state after approval
-                    setTimeout(() => {
-                        console.log('[Blaze] Refreshing after approval...');
-                        fetchGameState(blockchainData.userAddress);
-                    }, 3000);
+                    // Fetch the updated game state (this should get userNeedsApproval=false if confirmed)
+                    await fetchGameState(blockchainData.userAddress);
+                    
+                    // Check if approval worked (state is now false) and proceed to next step
+                    if (blockchainData.blaze.userNeedsApproval === false) {
+                        console.log('[Blaze] Approval confirmed on-chain. Calling handleBlazeClick to buy/blaze.');
+                        // Call the main handler to immediately proceed to the 'Blaze' transaction
+                        handleBlazeClick();
+                    } else {
+                        console.log('[Blaze] Approval sent but not yet confirmed or failed on-chain. Please try again.');
+                        // Ensure UI updates to show the "Approve" button remains if it failed.
+                        updateBlazeryUI();
+                    }
                     
                 } catch (error) {
                     console.error('[Blaze] Approval error:', error);
@@ -1703,11 +1711,12 @@
                         }
                     }
                     
-                    // ** CRITICAL: Render call inside a try/catch to isolate WASM issues **
+                    // ** CRITICAL FIX: Render call inside a try/catch to isolate WASM issues **
                     try {
                         renderer.render(scene, camera);
                     } catch (e) {
                         // This prevents the CanvasKit crash from stopping the entire animation frame loop
+                        // This allows the data fetching/UI logic to keep running
                         console.error('[WASM Render Crash] Animation frame failed:', e.message);
                     }
                 }
