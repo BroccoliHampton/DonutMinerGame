@@ -963,7 +963,7 @@
                     
                     // Check if user has enough LP tokens
                     const lpBalance = parseFloat(blockchainData.blaze.userLpBalanceFormatted);
-                    const lpNeeded = parseFloat(ethers.utils.formatEther(blockchainData.blaze.price));
+                    const lpNeeded = parseFloat(blockchainData.blaze.priceFormatted); // FIXED: Use already-formatted price from API
                     
                     if (lpBalance < lpNeeded) {
                         console.log('[Blaze] Insufficient LP balance');
