@@ -982,7 +982,7 @@
             }
             
             // NEW: Send LP token approval transaction - FIX SEQUENCE AND WAIT
-            async function sendApprovalTransaction(address) {
+           async function sendApprovalTransaction(address) {
                 try {
                     console.log('[Blaze] Fetching approval transaction data...');
                     
@@ -1017,30 +1017,43 @@
                     
                     const txHash = await sendTxWithRetry(provider, txParams);
                     
-                    console.log('[Blaze] Approval transaction sent:', txHash);
-                    console.log('Approval submitted! Waiting for confirmation to proceed to Blaze...');
+                    console.log('[Blaze] Approval transaction sent, TX Hash:', txHash);
                     
-                    // --- CRITICAL FIX: Wait for full refresh then call Blaze ---
-                    // Wait for 3 seconds minimum for confirmation (or use a dedicated checker if available)
-                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    // ==========================================================
+                    // *** CRITICAL FIX: WAIT FOR CONFIRMATION ***
+                    // We must create an Ethers provider to wait for the transaction. 
+                    // Use a public RPC URL if Farcaster's provider doesn't support .waitForTransaction
+                    const waitProvider = new ethers.providers.JsonRpcProvider('https://mainnet.base.org');
+                    console.log('[Blaze] Waiting for transaction to be confirmed on Base...');
                     
-                    // Fetch the updated game state (this should get userNeedsApproval=false if confirmed)
+                    const receipt = await waitProvider.waitForTransaction(txHash, 1, 60000); // 1 confirmation, 60s timeout
+                    
+                    if (receipt.status !== 1) {
+                         throw new Error("Approval transaction reverted on chain.");
+                    }
+                    console.log('[Blaze] Transaction confirmed and successfully mined.');
+                    // ==========================================================
+                    
+                    // 1. Fetch the updated game state (this should NOW get userNeedsApproval=false)
+                    // We add a tiny delay just to ensure the node has indexed the receipt.
+                    await new Promise(resolve => setTimeout(resolve, 500));
                     await fetchGameState(blockchainData.userAddress);
                     
-                    // Check if approval worked (state is now false) and proceed to next step
+                    // 2. Check if approval worked and proceed to the next transaction
                     if (blockchainData.blaze.userNeedsApproval === false) {
                         console.log('[Blaze] Approval confirmed on-chain. Calling handleBlazeClick to buy/blaze.');
                         // Call the main handler to immediately proceed to the 'Blaze' transaction
                         handleBlazeClick();
                     } else {
-                        console.log('[Blaze] Approval sent but not yet confirmed or failed on-chain. Please try again.');
-                        // Ensure UI updates to show the "Approve" button remains if it failed.
+                        // This case should ideally not happen if the TX confirmed successfully.
+                        console.log('[Blaze] Approval confirmed but state still reports needs approval. Check node indexing lag.');
                         updateBlazeryUI();
                     }
                     
                 } catch (error) {
                     console.error('[Blaze] Approval error:', error);
                     console.log(`Approval failed: ${error.message}`);
+                    updateBlazeryUI();
                 }
             }
             
