@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
     <style>
         /* [KEEPING ALL THE ORIGINAL STYLES - NO CHANGES] */
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
@@ -963,7 +964,8 @@
                     
                     // Check if user has enough LP tokens
                     const lpBalance = parseFloat(blockchainData.blaze.userLpBalanceFormatted);
-                    const lpNeeded = parseFloat(ethers.utils.formatEther(blockchainData.blaze.price));
+                    // NOTE: ethers.utils.formatEther(blockchainData.blaze.price) is redundant here as priceFormatted is already set
+                    const lpNeeded = parseFloat(blockchainData.blaze.priceFormatted);
                     
                     if (lpBalance < lpNeeded) {
                         console.log('[Blaze] Insufficient LP balance');
@@ -982,7 +984,7 @@
             }
             
             // NEW: Send LP token approval transaction - FIX SEQUENCE AND WAIT
-           async function sendApprovalTransaction(address) {
+            async function sendApprovalTransaction(address) {
                 try {
                     console.log('[Blaze] Fetching approval transaction data...');
                     
@@ -1020,9 +1022,9 @@
                     console.log('[Blaze] Approval transaction sent, TX Hash:', txHash);
                     
                     // ==========================================================
-                    // *** CRITICAL FIX: WAIT FOR CONFIRMATION ***
+                    // *** CRITICAL FIX: WAIT FOR CONFIRMATION (requires Ethers) ***
                     // We must create an Ethers provider to wait for the transaction. 
-                    // Use a public RPC URL if Farcaster's provider doesn't support .waitForTransaction
+                    // Ethers is now available globally due to the header script tag.
                     const waitProvider = new ethers.providers.JsonRpcProvider('https://mainnet.base.org');
                     console.log('[Blaze] Waiting for transaction to be confirmed on Base...');
                     
